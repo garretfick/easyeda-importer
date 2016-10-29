@@ -1,0 +1,22 @@
+{
+  "name": "easyeda-importer",
+  "version": "1.0.0",
+  "description": "Importer for file into EasyEDA",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./kicad/importer.js",
+    "run": "node ./kicad/importer.js",
+    "lint": "./node_modules/.bin/standard"
+  },
+  "keywords": [
+    "easyeda",
+    "kicad",
+    "import"
+  ],
+  "author": "Garret Fick",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "mocha": "3.1.2",
+    "standard": "8.5.0"
+  }
+}
