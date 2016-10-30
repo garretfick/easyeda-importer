@@ -4,8 +4,7 @@
   "description": "Importer for file into EasyEDA",
   "main": "index.js",
   "scripts": {
-    "test": "node ./kicad/importer.js",
-    "run": "node ./kicad/importer.js",
+    "test": "./node_modules/.bin/mocha",
     "dist": "./node_modules/.bin/webpack",
     "lint": "./node_modules/.bin/standard"
   },
@@ -18,7 +17,13 @@
   "license": "BSD-2-Clause",
   "devDependencies": {
     "mocha": "3.1.2",
+    "should": "11.1.1",
     "standard": "8.5.0",
     "webpack": "1.13.3"
+  },
+  "standard": {
+    "globals": [
+      "api"
+    ]
   }
 }

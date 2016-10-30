@@ -1,5 +1,6 @@
 # Standard node stuff
 node_modules/
+npm-debug.log
 
 # Ignore VisualStudio code project files
 .vscode/

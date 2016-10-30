@@ -4,7 +4,7 @@
  * Backend to generate the EasyEDA JSON-compatible data structure
  */
 class EasyEdaBackend {
-  construct () {
+  constructor () {
     this.schematic = null
     this.nextObjectIndex = 1
   }
@@ -116,8 +116,8 @@ class EasyEdaBackend {
   }
 
   _nextIdentifier () {
-    let identifier = 'gg3' + this.nextObjectIndex
-    this.nextObjectIndex += 1
+    // Create the identifier, then increment to the next index
+    let identifier = 'gg' + this.nextObjectIndex++
     return identifier
   }
 
