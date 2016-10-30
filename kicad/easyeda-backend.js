@@ -28,7 +28,7 @@ class EasyEdaBackend {
   }
 
   _getContext () {
-    return this.contexts[this.contexts.length - 1]
+    return this.contexts.length > 0 ? this.contexts[this.contexts.length - 1] : null
   }
 
   /**
