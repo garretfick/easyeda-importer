@@ -1,2 +1,8 @@
-node_modules
-.vscode
+# Standard node stuff
+node_modules/
+
+# Ignore VisualStudio code project files
+.vscode/
+
+# Ignore build artifacts
+build/

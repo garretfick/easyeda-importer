@@ -1,4 +1,4 @@
-const fs = require('fs')
+//const fs = require('fs')
 
 class EasyEdaBackend {
   construct () {
@@ -158,10 +158,11 @@ class KiCadReader
      */
   _readLines (schematic) {
     try {
-      let schematicData = fs.readFileSync(schematic, 'utf8').split('\n').map((line) => {
-        return line.trim()
-      })
-      return schematicData
+      //let schematicData = fs.readFileSync(schematic, 'utf8').split('\n').map((line) => {
+      //  return line.trim()
+      //})
+      //return schematicData
+      return {}
     } catch (e) {
       console.log('Cannot read schematic file')
       console.log(e)
