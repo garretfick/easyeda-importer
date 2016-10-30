@@ -12,7 +12,7 @@ describe('KiCadReader', () => {
   beforeEach(() => {
     // We need a new reader and backend with each test
     backend = new EasyEdaBackend()
-    backend.initializeSchematic()
+    backend.beginSchematicContext()
     reader = new KiCadReader()
     reader.backend = backend
   })

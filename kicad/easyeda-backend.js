@@ -5,16 +5,38 @@
  */
 class EasyEdaBackend {
   constructor () {
-    this.schematic = null
+    this.root = null
+    // Maintain a stack of the current context. Normally this is either 1 or 2 items, corresponding
+    // to either a schematic or a schlib in the schematic
+    this.contexts = []
     this.nextObjectIndex = 1
   }
 
-    /**
-     * Create the schematic container that owns all of the objects in the schematic.
-     * This is mostly just boiler place determined by outputting the JSON from EasyEDA
-     */
-  initializeSchematic () {
-    this.schematic = {
+  /**
+   * Push onto the context stack. If this is the first object, then this becomes the root
+   * context.
+   */
+  _pushContext (context) {
+    if (this.root === null) {
+      this.root = context
+    }
+    this.contexts.push(context)
+  }
+
+  _popContext () {
+    this.contexts.pop()
+  }
+
+  _getContext () {
+    return this.contexts[this.contexts.length - 1]
+  }
+
+  /**
+   * Create the schematic container that owns all of the objects in the schematic.
+   * This is mostly just boiler place determined by outputting the JSON from EasyEDA
+   */
+  beginSchematicContext () {
+    let schematic = {
       BBox: {
         height: 310,
         width: 156.4,
@@ -48,13 +70,47 @@ class EasyEdaBackend {
       },
       itemOrder: []
     }
+
+    this._pushContext(schematic)
   }
 
-    /**
-     * Add a rectangle to the current context
-     *
-     *
-     */
+  /**
+   * End the schematic context, removing it from the context stack
+   */
+  endSchematicContext () {
+    this._popContext()
+  }
+
+  /**
+   * Start a context that can hold a library of schlib objects. Normally this is used
+   * when reading a library before reading the containing schematic
+   */
+  beginSchLibContainerContext () {
+    let schlibContainer = {}
+    this._pushContext(schlibContainer)
+  }
+
+  endSchLibContainerContext () {
+    this._popContext()
+  }
+
+  /**
+   * Start a context for an individual schlib object (eg. a library component)
+   */
+  beginSchLibContext () {
+    let schlib = {}
+    this._pushContext(schlib)
+  }
+
+  endSchLibContext () {
+    this._popContext()
+  }
+
+  /**
+   * Add a rectangle to the current context
+   *
+   *
+   */
   rect () {
     let identifier = this._nextIdentifier()
     let objectData = {
@@ -103,16 +159,18 @@ class EasyEdaBackend {
   }
 
   _addObject (object, identifier, objectType) {
-        // Make sure the section for this type exists
-    if (!this.schematic.hasOwnProperty(objectType)) {
-      this.schematic[objectType] = {}
+    // Make sure the section for this type exists
+    let context = this._getContext()
+
+    if (!context.hasOwnProperty(objectType)) {
+      context[objectType] = {}
     }
 
         // Add the object
-    this.schematic[objectType][identifier] = object
+    context[objectType][identifier] = object
 
         // Then append the objec to the list of ordered objects
-    this.schematic.itemOrder.push(identifier)
+    context.itemOrder.push(identifier)
   }
 
   _nextIdentifier () {
@@ -122,7 +180,11 @@ class EasyEdaBackend {
   }
 
   getSchematic () {
-    return this.schematic
+    return this.root
+  }
+
+  getRoot () {
+    return this.root
   }
 }
 
