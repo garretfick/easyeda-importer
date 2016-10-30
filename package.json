@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node ./kicad/importer.js",
     "run": "node ./kicad/importer.js",
-    "dist": "./node_modules/.bin/webpack ./kicad/importer.js ./build/bundle.js",
+    "dist": "./node_modules/.bin/webpack",
     "lint": "./node_modules/.bin/standard"
   },
   "keywords": [
