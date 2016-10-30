@@ -114,7 +114,7 @@ class KiCadLibReader
    * @return The modified object. The object is converted in place, so this is only necessary
    * to use as a fluent API
    */
-  _readFieldsInto (targetObject, line, fieldIdentifiers, fieldTypeConverters = null) {
+  _readFieldsInto (targetObject, line, fieldIdentifiers, fieldTypeConverters) {
     let lineFields = line.split(' ')
     let maxField = Math.min(lineFields.length, fieldIdentifiers.length)
     for (let index = 0; index < maxField; ++index) {
