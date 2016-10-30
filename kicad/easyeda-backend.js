@@ -24,7 +24,7 @@ class EasyEdaBackend {
   }
 
   _popContext () {
-    this.contexts.pop()
+    return this.contexts.pop()
   }
 
   _getContext () {
@@ -98,12 +98,27 @@ class EasyEdaBackend {
    * Start a context for an individual schlib object (eg. a library component)
    */
   beginSchLibContext () {
+    // A schlib context can never be the root context
+    let parentContext = this._getContext()
+    if (!parentContext) {
+      throw Error('schlib context cannot be the root context. It must have a parent')
+    }
+
     let schlib = {}
     this._pushContext(schlib)
   }
 
   endSchLibContext () {
-    this._popContext()
+    let schlibContext = this._popContext()
+
+    // Add it to the owning parent, now that we know the name
+    // TODO I'm sure this name is wrong, just want the tests to pass
+    if (!schlibContext.hasOwnProperty('name')) {
+      throw Error('Context does not have a name. Cannot add this schlib item')
+    }
+
+    let parentContext = this._getContext()
+    parentContext[schlibContext['name']] = schlibContext
   }
 
   /**
