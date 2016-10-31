@@ -7,3 +7,6 @@ npm-debug.log
 
 # Ignore build artifacts
 dist/
+
+# Ignore coverage output files
+coverage/
