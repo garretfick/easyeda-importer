@@ -1,32 +1,32 @@
 {
-  "name": "easyeda-importer",
-  "version": "1.0.0",
-  "description": "Importer for file into EasyEDA",
-  "main": "index.js",
-  "scripts": {
-    "test": "./node_modules/.bin/mocha",
-    "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha  --report lcovonly -- --check-leaks",
-    "dist": "./node_modules/.bin/webpack",
-    "lint": "./node_modules/.bin/standard"
-  },
-  "keywords": [
-    "easyeda",
-    "kicad",
-    "import"
-  ],
-  "author": "Garret Fick",
-  "license": "BSD-2-Clause",
-  "devDependencies": {
-    "coveralls": "2.11.14",
-    "istanbul": "0.4.5",
-    "mocha": "3.1.2",
-    "should": "11.1.1",
-    "standard": "8.5.0",
-    "webpack": "1.13.3"
-  },
-  "standard": {
-    "globals": [
-      "api"
-    ]
-  }
+    "name": "easyeda-importer",
+    "version": "1.0.0",
+    "description": "Importer for file into EasyEDA",
+    "main": "index.js",
+    "scripts": {
+        "test": "./node_modules/.bin/mocha",
+        "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha  --report lcovonly -- --check-leaks",
+        "dist": "./node_modules/.bin/webpack",
+        "lint": "./node_modules/.bin/standard"
+    },
+    "keywords": [
+        "easyeda",
+        "kicad",
+        "import"
+    ],
+    "author": "Garret Fick",
+    "license": "BSD-2-Clause",
+    "devDependencies": {
+        "coveralls": "2.11.14",
+        "istanbul": "0.4.5",
+        "mocha": "3.1.2",
+        "should": "11.1.1",
+        "standard": "8.5.0",
+        "webpack": "1.13.3"
+    },
+    "standard": {
+        "globals": [
+            "api"
+        ]
+    }
 }

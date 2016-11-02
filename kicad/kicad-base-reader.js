@@ -3,23 +3,23 @@
 class KiCadBaseReader {
     /**
      * Parse KiCad's representation of boolean values. These are either Y or N
-     * 
+     *
      * @param {string} value The value to parse
-     * 
+     *
      * @return {boolean} True if the value is 'Y', false if the value is 'N'
-     * 
+     *
      * @throws Error if the value is not Y or N
      */
-    static parseYN(value) {
-        return KiCadBaseReader.parseOptions(value, { Y: true, N: false })
-    }
+  static parseYN (value) {
+    return KiCadBaseReader.parseOptions(value, { Y: true, N: false })
+  }
 
-    static parseOptions(value, options) {
-        if (options.hasOwnProperty(value)) {
-            return options[value]
-        }
-        throw Error(value + ' is unexpected option')
+  static parseOptions (value, options) {
+    if (options.hasOwnProperty(value)) {
+      return options[value]
     }
+    throw Error(value + ' is unexpected option')
+  }
 
     /**
      * Reads a line containing space separated fields into the data object.
@@ -40,50 +40,50 @@ class KiCadBaseReader {
      * @return The modified object. The object is converted in place, so this is only necessary
      * to use as a fluent API
      */
-    static readFieldsInto(targetObject, line, fieldIdentifiers, fieldTypeConverters) {
-        let lineFields = line.split(' ')
-        let maxField = Math.min(lineFields.length, fieldIdentifiers.length)
-        for (let index = 0; index < maxField; ++index) {
-            let value = lineFields[index]
+  static readFieldsInto (targetObject, line, fieldIdentifiers, fieldTypeConverters) {
+    let lineFields = line.split(' ')
+    let maxField = Math.min(lineFields.length, fieldIdentifiers.length)
+    for (let index = 0; index < maxField; ++index) {
+      let value = lineFields[index]
 
             // If the field name is null, then skip it. We don't need the value
-            let fieldName = fieldIdentifiers[index]
-            if (!fieldName) {
-                continue
-            }
+      let fieldName = fieldIdentifiers[index]
+      if (!fieldName) {
+        continue
+      }
 
             // Do we want to convert this value? We may not be using type conversion at all
-            let typeConverter = fieldTypeConverters ? fieldTypeConverters[index] : null
-            if (typeConverter) {
-                value = typeConverter(value)
-            }
+      let typeConverter = fieldTypeConverters ? fieldTypeConverters[index] : null
+      if (typeConverter) {
+        value = typeConverter(value)
+      }
 
-            targetObject[fieldName] = value
-        }
-
-        return targetObject
+      targetObject[fieldName] = value
     }
+
+    return targetObject
+  }
 
     /**
      * Read the fields into an array, skipping the specified number of fields.
-     * 
+     *
      * For example, _readFieldsInfoArray('ALIAS name1 name2 name3', 1) returns ['name1', 'name2', 'name3']
-     * 
+     *
      * @param {string} line The string to read into array
-     * 
+     *
      * @param {int} Offset into the string to start (array index)
-     * 
+     *
      * @return array of elements. Always returns an array, even if no elements
      */
-    static readFieldsIntoArray(line, startOffset) {
-        let lineFields = line.split(' ')
-        if (startOffset === undefined) {
-            return lineFields
-        } else if (lineFields.length >= startOffset) {
-            return lineFields.slice(startOffset)
-        }
-        return []
+  static readFieldsIntoArray (line, startOffset) {
+    let lineFields = line.split(' ')
+    if (startOffset === undefined) {
+      return lineFields
+    } else if (lineFields.length >= startOffset) {
+      return lineFields.slice(startOffset)
     }
+    return []
+  }
 
 }
 

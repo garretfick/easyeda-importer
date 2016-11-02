@@ -9,57 +9,57 @@ const EasyEdaBackend = require('../kicad/easyeda-backend')
 const KiCadLibReader = require('../kicad/kicad-lib-reader')
 
 describe('KiCadLibReader', () => {
-    describe('#_readLibrary()', () => {
-        let backend = null
-        let reader = null
+  describe('#_readLibrary()', () => {
+    let backend = null
+    let reader = null
 
-        beforeEach(() => {
+    beforeEach(() => {
             // We need a new reader and backend with each test
-            backend = new EasyEdaBackend()
+      backend = new EasyEdaBackend()
                 // For these tests, we are reading individual components
                 // so we just need the schlib container context that owns
                 // the read components
-            backend.beginSchLibContainerContext()
+      backend.beginSchLibContainerContext()
 
-            reader = new KiCadLibReader()
-            reader.backend = backend
-        })
+      reader = new KiCadLibReader()
+      reader.backend = backend
+    })
 
-        it('_readLibrary() read library with one component', () => {
-            let libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
-            reader._readLibrary(libContents)
+    it('_readLibrary() read library with one component', () => {
+      let libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
+      reader._readLibrary(libContents)
 
-            let root = backend.getRoot()
+      let root = backend.getRoot()
 
-            root.should.have.property('LM1875')
+      root.should.have.property('LM1875')
 
-            let libItem = root['LM1875']
-            libItem.should.have.property('aliases')
+      let libItem = root['LM1875']
+      libItem.should.have.property('aliases')
             // TODO test more properties
-        })
+    })
+  })
+
+  describe('#_readLibraryField()', () => {
+    let reader = new KiCadLibReader()
+
+    it('_readLibraryField() simple value', () => {
+      let field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
+
+      field.should.have.property('value')
+      field.value.should.equal('DIODE')
+
+      field.should.have.property('name')
+      should.not.exist(field.name)
     })
 
-    describe('#_readLibraryField()', () => {
-        let reader = new KiCadLibReader()
+    it('_readLibraryField() has name field', () => {
+      let field = reader._readLibraryField('F2 "2euros" 0 -200 50 H V L CIB "PRICE"')
 
-        it('_readLibraryField() simple value', () => {
-            let field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
+      field.should.have.property('value')
+      field.value.should.equal('2euros')
 
-            field.should.have.property('value')
-            field.value.should.equal('DIODE')
-
-            field.should.have.property('name')
-            should.not.exist(field.name)
-        })
-
-        it('_readLibraryField() has name field', () => {
-            let field = reader._readLibraryField('F2 "2euros" 0 -200 50 H V L CIB "PRICE"')
-
-            field.should.have.property('value')
-            field.value.should.equal('2euros')
-
-            field.should.have.property('name')
-            field.name.should.equal('PRICE')
-        })
+      field.should.have.property('name')
+      field.name.should.equal('PRICE')
     })
+  })
 })
