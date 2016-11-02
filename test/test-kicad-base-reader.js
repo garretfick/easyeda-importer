@@ -11,14 +11,14 @@ describe('KiCadBaseReader', () => {
 
     describe('#readFieldsInfoArray()', () => {
         it('handles start offset larger than number of elements', () => {
-            let readArray = rd.readFieldsInfoArray('ALIAS name1', 2)
+            let readArray = rd.readFieldsIntoArray('ALIAS name1', 2)
 
             readArray.should.be.an.Array()
             readArray.should.be.empty()
         })
 
         it('returns the right elements', () => {
-            let readArray = rd.readFieldsInfoArray('ALIAS name1 name2', 1)
+            let readArray = rd.readFieldsIntoArray('ALIAS name1 name2', 1)
 
             readArray.should.be.an.Array()
             readArray.should.have.length(2)
@@ -27,7 +27,7 @@ describe('KiCadBaseReader', () => {
         })
 
         it('handles no offset correctly', () => {
-            let readArray = rd.readFieldsInfoArray('ALIAS name1 name2')
+            let readArray = rd.readFieldsIntoArray('ALIAS name1 name2')
 
             readArray.should.be.an.Array()
             readArray.should.have.length(3)

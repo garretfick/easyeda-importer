@@ -24,7 +24,7 @@ class KiCadBaseReader {
     /**
      * Reads a line containing space separated fields into the data object.
      *
-     * @param {string} targetObject The object to read into.
+     * @param {object} targetObject The object to read into.
      *
      * @param {string} line The line to read.
      *
@@ -75,7 +75,7 @@ class KiCadBaseReader {
      * 
      * @return array of elements. Always returns an array, even if no elements
      */
-    static readFieldsInfoArray(line, startOffset) {
+    static readFieldsIntoArray(line, startOffset) {
         let lineFields = line.split(' ')
         if (startOffset === undefined) {
             return lineFields

@@ -78,6 +78,7 @@ class KiCadLibReader {
             this.backend.beginSchLibContext()
 
             let schlibDef = {}
+
             rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
                 'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
                 'units_locked', 'option_flag'
@@ -87,29 +88,69 @@ class KiCadLibReader {
             ])
 
             if (libraryData[index].startsWith('ALIAS')) {
-                schlibDef.aliases = rd.readFieldsInfo(libraryData[index++], 1)
+                schlibDef.aliases = rd.readFieldsIntoArray(libraryData[index++], 1)
             } else {
                 schlibDef.aliases = []
             }
 
             // Read the field values until we don't have any more
             while (libraryData[index][0] === 'F') {
+                // TODO properly handle these
+                this._readLibraryField(libraryData[index], schlibDef)
                 index++
             }
 
-            // TODO this is completely wrong - just temporary to get tests to pass
-            this.backend._getContext().name = schlibDef.name
+            // TODO Handle the $FPLIST
 
             while (!libraryData[index].startsWith('ENDDEF') && index < libraryData.length) {
-                console.log(libraryData[index])
                 index += 1
             }
+
+            this.backend.update(schlibDef)
         } finally {
             // We always need to release the context we created
             this.backend.endSchLibContext()
         }
 
         return index
+    }
+
+    /**
+     * Read one of the F values from KiCad
+     * 
+     * @param {string} value The full line e.g. F0 DIP-8...
+     * 
+     * @param {object} schLibDef The library definition to read into
+     */
+    _readLibraryField(value, schLibDef) {
+        let item = {}
+
+        // parseInt stops at the first non-integer character, so the spaces at the end are ok
+        let fieldIdentifier = parseInt(value.substr(1))
+
+        // We cannot use the normal read into object because the item may have spaces
+        // so first find the enclosing double quotes
+        let startText = value.indexOf('"', 2)
+        let endText = value.indexOf('"', startText + 1)
+        item.value = value.substr(startText + 1, endText - startText - 1)
+
+        // The field might have a name, and we can detect this by finding
+        // double quotes after the first set
+        let startName = value.indexOf('"', endText + 1)
+        let endName = startName > -1 ? value.indexOf('"', startName + 1) : -1
+        item.name = startName > -1 ? value.substr(startName + 1, endName - startName - 1) : null
+
+        // The middle part of the string are the properties. Get the substr for the
+        // part that forms the properties (so we don't have to split on the end name
+        // if it exists)
+        let propertiesValue = startName > -1 ? value.substr(endText + 1, startName - endText - 1) : value.substr(endText)
+
+        // Read the part of the value after the string identifier. We trim the properties value
+        // since we really don't know how many extra spaces it might have
+        let fields = {}
+        rd.readFieldsInto(fields, propertiesValue.trim(), ['x', 'y', 'dimension', 'orientation', 'visibility', 'format'], [parseInt, parseInt, parseInt, null, null, null])
+
+        return item
     }
 
     static parseIsIdenticalUnits(value) {

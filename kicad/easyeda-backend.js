@@ -109,16 +109,16 @@ class EasyEdaBackend {
   }
 
   endSchLibContext () {
-    let schlibContext = this._popContext()
-
-    // Add it to the owning parent, now that we know the name
-    // TODO I'm sure this name is wrong, just want the tests to pass
-    if (!schlibContext.hasOwnProperty('name')) {
-      throw Error('Context does not have a name. Cannot add this schlib item')
-    }
-
-    let parentContext = this._getContext()
-    parentContext[schlibContext['name']] = schlibContext
+    let schlibContext = this._popContext()                                                                                              
+                                                                                                                                        
+    // Add it to the owning parent, now that we know the name                                                                           
+    // TODO I'm sure this name is wrong, just want the tests to pass                                                                    
+    if (!schlibContext.hasOwnProperty('name')) {                                                                                        
+      throw Error('Context does not have a name. Cannot add this schlib item')                                                          
+    }                                                                                                                                   
+                                                                                                                                        
+    let parentContext = this._getContext()                                                                                              
+    parentContext[schlibContext['name']] = schlibContext   
   }
 
   /**
@@ -171,6 +171,16 @@ class EasyEdaBackend {
     this._addObject(objectData, identifier, 'annotation')
 
     return this
+  }
+
+  /**
+   * Update the context with the properties from the object
+   * 
+   * TODO this is a bad hack, but it gets things moving along
+   */
+  update(updateObject) {
+    let contextObject = this._getContext()
+    Object.assign(contextObject, updateObject)
   }
 
   _addObject (object, identifier, objectType) {
