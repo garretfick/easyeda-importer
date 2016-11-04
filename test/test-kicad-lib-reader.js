@@ -35,6 +35,10 @@ describe('KiCadLibReader', () => {
 
       let libItem = root['LM1875']
       libItem.should.have.property('aliases')
+
+      libItem.should.have.property('packages')
+      libItem.packages.should.be.array
+      libItem.packages[0].should.equal('TO*')
             // TODO test more properties
     })
   })

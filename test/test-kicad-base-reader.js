@@ -50,4 +50,11 @@ describe('KiCadBaseReader', () => {
       }).should.throw('A is unexpected option')
     })
   })
+  
+  describe('#indexOfAny()', () => {
+    it('Y returns true', () => {
+      let lines =  ['TO*', '$ENDFPLIST', 'DRAW', 'P 4 0 1']
+      rd.indexOfAny(['ENDDEF', 'DRAW'], lines, 0).should.be.equal(2)
+    })
+  })
 })

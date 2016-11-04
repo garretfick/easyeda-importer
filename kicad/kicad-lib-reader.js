@@ -12,19 +12,19 @@ class KiCadLibReader {
     this.backend = null
   }
 
-    /**
-     * Convert the schematic to EasyEDA format using the EasyEDA backend
-     * to generate the objects
-     *
-     * @param {object} backend The backend for outputing the read data
-     */
+  /**
+   * Convert the schematic to EasyEDA format using the EasyEDA backend
+   * to generate the objects
+   *
+   * @param {object} backend The backend for outputing the read data
+   */
   read (backend) {
     this.backend = backend
   }
 
-    /**
-     * Evil function, but useful for testing for now
-     */
+  /**
+   * Evil function, but useful for testing for now
+   */
   _readLines (library) {
     try {
       let libraryData = library.split('\n').map((line) => {
@@ -56,8 +56,8 @@ class KiCadLibReader {
       for (let index = 1; index < libraryData.length; ++index) {
         let line = libraryData[index]
 
-                // Each line is one of a few different types, all keyed based on the beginning
-                // of the line
+        // Each line is one of a few different types, all keyed based on the beginning
+        // of the line
         if (line.startsWith('#')) {
           continue
         } else if (line.startsWith('DEF')) {
@@ -71,10 +71,13 @@ class KiCadLibReader {
     }
   }
 
+  /**
+   * @param {array} libraryData
+   */
   _readComponent (libraryData, index) {
     try {
-            // TODO small bug where if we cannot create the context, then
-            // TODO in the finally, we will release a context that we didn't create
+      // TODO small bug where if we cannot create the context, then
+      // TODO in the finally, we will release a context that we didn't create
       this.backend.beginSchLibContext()
 
       let schlibDef = {}
@@ -93,18 +96,37 @@ class KiCadLibReader {
         schlibDef.aliases = []
       }
 
-            // Read the field values until we don't have any more
+      // Read the field values until we don't have any more
       while (libraryData[index][0] === 'F') {
-                // TODO properly handle these
+        // TODO properly handle these
         this._readLibraryField(libraryData[index], schlibDef)
         index++
       }
 
-            // TODO Handle the $FPLIST
-
-      while (!libraryData[index].startsWith('ENDDEF') && index < libraryData.length) {
-        index += 1
+      // Handle the $FPLIST, which is a list of footprint names for the component
+      if (libraryData[index].startsWith('$FPLIST')) {
+        let extraPackageNames = []
+        while (libraryData[++index] !== '$ENDFPLIST') {
+          extraPackageNames.push(libraryData[index].trim())
+        }
+        schlibDef.packages = extraPackageNames
       }
+
+      // Read forward until the DRAW section, in case there are things we don't
+      // understand
+      index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
+
+      if (libraryData[index] === 'DRAW') {
+        schlibDef.graphics = []
+
+        // Read the inner draw section
+        while (!libraryData[index++].startsWith('ENDDRAW')) {
+          schlibDef.graphics.push(this._readGraphic(libraryData[index]))
+        }
+      }
+
+      // Read until the end of the component
+      index = rd.indexOfAny(['ENDDEF'], libraryData, index)
 
       this.backend.update(schlibDef)
     } finally {
@@ -151,6 +173,35 @@ class KiCadLibReader {
     rd.readFieldsInto(fields, propertiesValue.trim(), ['x', 'y', 'dimension', 'orientation', 'visibility', 'format'], [parseInt, parseInt, parseInt, null, null, null])
 
     return item
+  }
+
+  /**
+   * Read the graphic element
+   */
+  _readGraphic(value) {
+    let graphicType = value[0]
+
+    switch (graphicType) {
+      case 'P':
+        // Nb parts convert thickness x0 y0 x1 y1 xi yi cc
+        let polygon = {}
+        rd.readFieldsInto(polygon, value, [null, 'points', 'unit', 'convert', 'thickness'])
+        break
+      case 'S':
+        // S startx starty endx endy unit convert thickness cc
+        break
+      case 'C':
+        // C posx posy radius unit convert thickness cc
+        break
+      case 'A':
+        // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
+        break
+      case 'T':
+        // T orientation posx posy dimension unit convert Text
+        break
+      case 'X':
+        // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
+    }
   }
 
   static parseIsIdenticalUnits (value) {
