@@ -87,7 +87,7 @@ class KiCadLibReader {
                 'units_locked', 'option_flag'
             ], [null, null, null, null,
                 null, rd.parseYN, rd.parseYN, parseInt,
-                rd.parseIsIdenticalUnits, rd.parseIsPower
+                KiCadLibReader._parseIsIdenticalUnits, KiCadLibReader._parseIsPower
             ])
 
       if (libraryData[index].startsWith('ALIAS')) {
@@ -178,32 +178,100 @@ class KiCadLibReader {
   /**
    * Read the graphic element
    */
-  _readGraphic(value) {
+  _readGraphic (value) {
     let graphicType = value[0]
+    let shape = {}
 
     switch (graphicType) {
       case 'P':
-        // Nb parts convert thickness x0 y0 x1 y1 xi yi cc
-        let polygon = {}
-        rd.readFieldsInto(polygon, value, [null, 'points', 'unit', 'convert', 'thickness'])
+        // Nb parts convert thickness x0 y0 x1 y1 ... xi yi cc
+
+        // Read in the first part before the variable length section
+        let fields = value.split(' ')
+        rd.readSplitFieldsInfo(shape, fields,
+          [null, 'numPoints', 'unit', 'convert', 'thickness'],
+          [null, parseInt, parseInt, parseInt, parseInt])
+
+        // Now the variable points, two at a time, starting at the 5th item
+        // which is where the points begin
+        let lastValIndex = 5 + shape.numPoints * 2;
+        let points = []
+        for (let valIndex = 5; valIndex < lastValIndex; valIndex += 2) {
+          points.push({
+            x: parseInt(fields[valIndex]),
+            y: parseInt(fields[valIndex + 1])
+          })
+        }
+
+        // Set the points in our shape
+        shape.points = points
+
+        // Finally, the last item is the fill
+        shape.filled = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
         break
       case 'S':
         // S startx starty endx endy unit convert thickness cc
+        rd.readFieldsInto(shape, value,
+          [null, 'startx', 'starty', 'endx',
+          'endy', 'unit', 'convert', 'thickness',
+          'filled'],
+          [null, parseInt, parseInt, parseInt,
+          parseInt, parseInt, parseInt, parseInt,
+          KiCadLibReader._parseFillStyle])
         break
       case 'C':
         // C posx posy radius unit convert thickness cc
+        rd.readFieldsInto(shape, value,
+          [null, 'x', 'y', 'radius',
+          'unit', 'convert', 'thickness', 'filled'],
+          [null, parseInt, parseInt, parseInt,
+          parseInt, parseInt, parseInt, KiCadLibReader._parseFillStyle])
         break
       case 'A':
         // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
+        rd.readFieldsInto(shape, value,
+          [null, 'x', 'y', 'radius',
+          'startAngle', 'endAngle', 'unit', 'convert',
+          'thickness', 'filled', 'startPointX', 'startPointY',
+          'endPointX', 'endPointY'],
+          [null, parseInt, parseInt, parseInt,
+          rd.parseTenthDegreesToDegrees, rd.parseTenthDegreesToDegrees, parseInt, parseInt,
+          parseInt, KiCadLibReader._parseFillStyle, parseInt, parseInt,
+          parseInt, parseInt])
         break
       case 'T':
         // T orientation posx posy dimension unit convert Text
+        rd.readFieldsInto(shape, value,
+          [null, 'orientation', 'x', 'y',
+          'dimension', 'unit', 'convert', 'text'],
+          [null, KiCadLibReader._parseTextOrientation, parseInt, parseInt,
+          parseInt, parseInt, parseInt, null])
         break
       case 'X':
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
+        // TODO the shape and electrical type are not handled yet
+        rd.readFieldsInto(shape, value,
+          [null, 'name', 'number', 'x', 'y', 
+          'length', 'orientation', 'numberDimension', 'nameDimension',
+          'unit', 'convert', 'electricalType', 'shape'],
+          [null, null, null, parseInt, parseInt,
+          parseInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
+          parseInt, parseInt, null, null])
+        break
     }
+
+    return shape
   }
 
+  /**
+   * Parse the value if the item has all units as identical
+   *
+   * @param {string} value The value to parse (single character)
+   *
+   * @return {boolean} True if all parts are identical, otherwise false
+   *
+   * @private
+   */
   static parseIsIdenticalUnits (value) {
     return rd.parseOptions(value, {
       L: false, // Locked, units are not identical
@@ -211,8 +279,30 @@ class KiCadLibReader {
     })
   }
 
-  static parseIsPower (value) {
+  /**
+   * Parse the value if the part is a power part
+   *
+   * @param {string} The value to parse (single character)
+   *
+   * @return {boolean} True if all parts is a power part, otherwise false
+   *
+   * @private
+   */
+  static _parseIsPower (value) {
     return rd.parseOptions(value, { N: false, P: true })
+  }
+
+  /**
+   * Parse if the graphic shape is filled or transparent background
+   *
+   * @param {string} The value to parse (single character)
+   *
+   * @return {boolean} True if all graphic is filled, false if the graphic background is transparent
+   *
+   * @private
+   */
+  static _parseFillStyle (value) {
+    return rd.parseOptions(value, { F: true, f: true, N: false })
   }
 
   _convertPoint (data, xName = 'x', yName = 'y') {

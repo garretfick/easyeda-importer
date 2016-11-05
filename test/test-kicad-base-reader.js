@@ -2,8 +2,6 @@
 
 'use strict'
 
-const assert = require('assert')
-const should = require('should')
 const rd = require('../kicad/kicad-base-reader')
 
 describe('KiCadBaseReader', () => {
@@ -50,10 +48,10 @@ describe('KiCadBaseReader', () => {
       }).should.throw('A is unexpected option')
     })
   })
-  
+
   describe('#indexOfAny()', () => {
     it('Y returns true', () => {
-      let lines =  ['TO*', '$ENDFPLIST', 'DRAW', 'P 4 0 1']
+      let lines = ['TO*', '$ENDFPLIST', 'DRAW', 'P 4 0 1']
       rd.indexOfAny(['ENDDEF', 'DRAW'], lines, 0).should.be.equal(2)
     })
   })

@@ -3,7 +3,6 @@
 'use strict'
 
 const fs = require('fs')
-const assert = require('assert')
 const should = require('should')
 const EasyEdaBackend = require('../kicad/easyeda-backend')
 const KiCadLibReader = require('../kicad/kicad-lib-reader')
@@ -64,6 +63,167 @@ describe('KiCadLibReader', () => {
 
       field.should.have.property('name')
       field.name.should.equal('PRICE')
+    })
+  })
+
+  describe('#_readGraphic()', () => {
+    let reader = new KiCadLibReader()
+
+        it('_readGraphic() polygon 1', () => {
+      let shape = reader._readGraphic('P 3 0 1 0 -50 50 50 0 -50 -50 F')
+
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.thickness.should.equal(0)
+      shape.filled.should.be.true
+
+      shape.points.should.eql([
+        {x: -50, y: 50},
+        {x: 50, y: 0}, 
+        {x: -50, y:-50}])
+    })
+
+    it('_readGraphic() rectangle', () => {
+      let shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
+
+      shape.startx.should.equal(0)
+      shape.starty.should.equal(50)
+      shape.endx.should.equal(900)
+      shape.endy.should.equal(900)
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.thickness.should.equal(0)
+      shape.filled.should.be.false
+    })
+
+    it('_readGraphic() circle', () => {
+      let shape = reader._readGraphic('C 0 50 70 0 1 0 F')
+
+      shape.x.should.equal(0)
+      shape.y.should.equal(50)
+      shape.radius.should.equal(70)
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.thickness.should.equal(0)
+      shape.filled.should.be.true
+    })
+
+    it('_readGraphic() arc 1', () => {
+      let shape = reader._readGraphic('A -1 -200 49 900 -11 0 1 0 N -50 -200 0 -150')
+
+      shape.x.should.equal(-1)
+      shape.y.should.equal(-200)
+      shape.radius.should.equal(49)
+      shape.startAngle.should.equal(90.0)
+      shape.endAngle.should.equal(-1.1)
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.thickness.should.equal(0)
+      shape.filled.should.be.false
+      shape.startPointX.should.equal(-50)
+      shape.startPointY.should.equal(-200)
+      shape.endPointX.should.equal(0)
+      shape.endPointY.should.equal(-150)
+    })
+
+    it('_readGraphic() arc 2', () => {
+      let shape = reader._readGraphic('A 0 -199 49 0 -911 0 1 0 N 0 -150 50 -200')
+
+      shape.x.should.equal(0)
+      shape.y.should.equal(-199)
+      shape.radius.should.equal(49)
+      shape.startAngle.should.equal(0)
+      shape.endAngle.should.equal(-91.1)
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.thickness.should.equal(0)
+      shape.filled.should.be.false
+      shape.startPointX.should.equal(0)
+      shape.startPointY.should.equal(-150)
+      shape.endPointX.should.equal(50)
+      shape.endPointY.should.equal(-200)
+    })
+
+    it('_readGraphic() text', () => {
+      let shape = reader._readGraphic('T 0 -320 -10 100 0 1 VREF')
+
+      // TODO this orientation is not handled correctly
+      shape.orientation.should.equal('0')
+      shape.x.should.equal(-320)
+      shape.y.should.equal(-10)
+      shape.dimension.should.equal(100)
+      shape.unit.should.equal(0)
+      shape.convert.should.equal(1)
+      shape.text.should.equal('VREF')
+    })
+
+    it('_readGraphic() pin 1', () => {
+      let shape = reader._readGraphic('X TO 1 200 0 150 R 40 40 1 1 P')
+
+      // TODO this orientation is not handled correctly
+      shape.name.should.equal('TO')
+      shape.number.should.equal('1')
+      shape.x.should.equal(200)
+      shape.y.should.equal(0)
+      shape.length.should.equal(150)
+      shape.orientation.should.equal('R')
+      shape.numberDimension.should.equal(40)
+      shape.nameDimension.should.equal(40)
+      shape.unit.should.equal(1)
+      shape.convert.should.equal(1)
+      shape.electricalType.should.equal('P')
+    })
+
+    it('_readGraphic() pin 2', () => {
+      let shape = reader._readGraphic('X K 2 200 0 150 L 40 40 1 1 P')
+
+      // TODO this orientation is not handled correctly
+      shape.name.should.equal('K')
+      shape.number.should.equal('2')
+      shape.x.should.equal(200)
+      shape.y.should.equal(0)
+      shape.length.should.equal(150)
+      shape.orientation.should.equal('L')
+      shape.numberDimension.should.equal(40)
+      shape.nameDimension.should.equal(40)
+      shape.unit.should.equal(1)
+      shape.convert.should.equal(1)
+      shape.electricalType.should.equal('P')
+    })
+
+    it('_readGraphic() pin 2', () => {
+      let shape = reader._readGraphic('X 0 1 0 0 0 R 40 40 1 1 W NC')
+
+      // TODO this orientation is not handled correctly
+      shape.name.should.equal('0')
+      shape.number.should.equal('1')
+      shape.x.should.equal(0)
+      shape.y.should.equal(0)
+      shape.length.should.equal(0)
+      shape.orientation.should.equal('R')
+      shape.numberDimension.should.equal(40)
+      shape.nameDimension.should.equal(40)
+      shape.unit.should.equal(1)
+      shape.convert.should.equal(1)
+      shape.electricalType.should.equal('W')
+      shape.shape.should.equal('NC')
+    })
+
+    it('_readGraphic() pin 2', () => {
+      let shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
+
+      // TODO this orientation is not handled correctly
+      shape.name.should.equal('~')
+      shape.number.should.equal('2')
+      shape.x.should.equal(0)
+      shape.y.should.equal(250)
+      shape.length.should.equal(200)
+      shape.orientation.should.equal('U')
+      shape.numberDimension.should.equal(40)
+      shape.nameDimension.should.equal(40)
+      shape.unit.should.equal(1)
+      shape.convert.should.equal(1)
+      shape.electricalType.should.equal('P')
     })
   })
 })

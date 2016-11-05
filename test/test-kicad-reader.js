@@ -2,8 +2,6 @@
 
 'use strict'
 
-const assert = require('assert')
-const should = require('should')
 const EasyEdaBackend = require('../kicad/easyeda-backend')
 const KiCadReader = require('../kicad/kicad-reader')
 
