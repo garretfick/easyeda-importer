@@ -19,7 +19,7 @@ class KiCadLibReader {
    * @param {string} source The read library data
    */
   read (source) {
-    this._readLines(source)
+    this._readLibrary(source)
     return this.library
   }
 

@@ -78,7 +78,7 @@ class EasyEdaBackend {
    * End the schematic context, removing it from the context stack
    */
   endSchematicContext () {
-    this._popContext()
+    return this._popContext()
   }
 
   /**

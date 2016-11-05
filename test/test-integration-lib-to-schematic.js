@@ -28,7 +28,7 @@ describe('Integration library to schematic', () => {
       let schematic = backend.getSchematic()
 
       // TODO this test is definitely incomplete
-      should.not.be.null(schematic)
+      should.exist(schematic)
     })
   })
 })

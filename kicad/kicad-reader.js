@@ -14,7 +14,7 @@ class KiCadReader
   constructor () {
     this.backend = null
     this.schematics = []
-    this.schematicLibs = []
+    this.schematicLibs = {}
   }
 
   /**
@@ -28,7 +28,9 @@ class KiCadReader
    */
   addLibrarySource (source, name) {
     let libReader = new KiCadLibReader()
-    libReader.read(source)
+    let library = libReader.read(source)
+
+    this.schematicLibs['name'] = library
   }
 
   /**
@@ -55,14 +57,16 @@ class KiCadReader
    * reader.getSchematic()
    */
   libraryToSchematic (libraryName) {
+    this.backend.beginSchematicContext()
 
+    this.backend.endSchematicContext()
   }
 
   /**
    * Convert the schematic to EasyEDA format using the EasyEDA backend
    * to generate the objects
    *
-   * @param {object} backend The backend for outputing the read data
+   * @param {EasyEdaBackend} backend The backend for outputing the read data
    */
   read (backend) {
     this.backend = backend
