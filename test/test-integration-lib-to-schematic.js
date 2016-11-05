@@ -3,6 +3,7 @@
 'use strict'
 
 const fs = require('fs')
+const should = require('should')
 const EasyEdaBackend = require('../kicad/easyeda-backend')
 const KiCadReader = require('../kicad/kicad-reader')
 

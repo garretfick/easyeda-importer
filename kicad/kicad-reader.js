@@ -20,16 +20,15 @@ class KiCadReader
   /**
    * Add the library to the reader. You should add required libraries to the reader
    * prior to reading a schematic
-   * 
+   *
    * @param {string} source The read library contents
-   * 
+   *
    * @param {string} name The name of the library (usually this is the file name without the extension).
    * This name is used to find the library when reading schematics
    */
   addLibrarySource (source, name) {
     let libReader = new KiCadLibReader()
     libReader.read(source)
-
   }
 
   /**
@@ -45,11 +44,11 @@ class KiCadReader
    * Convert a library into EasyEDA schematic. Use this to import the entire contents of a KiCAD
    * library into an EasyEDA schematic. This will import the library by placing all components
    * in the library into a schematic.
-   * 
+   *
    * You must have first added the library source to the reader (see KiCadReader.addLibrarySource)
-   * 
+   *
    * For example:
-   * 
+   *
    * reader = new KiCadReader()
    * reader.addLibrarySource(stream, 'OPAMPS')
    * reader.libraryToSchematic('OPAMPS')

@@ -34,9 +34,9 @@ class KiCadBaseReader {
 
   /**
    * KiCad uses microdegrees, but we want degrees. Parse and convert to floating point
-   * 
+   *
    * @param {string} value The value to read
-   * 
+   *
    * @return {number} The value in degrees
    */
   static parseTenthDegreesToDegrees (value) {

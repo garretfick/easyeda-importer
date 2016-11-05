@@ -8,7 +8,7 @@ const rd = require('./kicad-base-reader')
  * This is normally constructed by the KiCadReader
  */
 class KiCadLibReader {
-  constructor() {
+  constructor () {
     this.library = {}
   }
 
@@ -38,7 +38,7 @@ class KiCadLibReader {
    * we will need to copy each instance we discover.
    *
    * @param {string} library The library contents to read
-   * 
+   *
    * @return {object} The read library. The keys in the returned data are the
    * names of compoents in the library. The values are the parsed data
    */
@@ -189,7 +189,7 @@ class KiCadLibReader {
 
         // Now the variable points, two at a time, starting at the 5th item
         // which is where the points begin
-        let lastValIndex = 5 + shape.numPoints * 2;
+        let lastValIndex = 5 + shape.numPoints * 2
         let points = []
         for (let valIndex = 5; valIndex < lastValIndex; valIndex += 2) {
           points.push({
@@ -246,7 +246,7 @@ class KiCadLibReader {
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
         // TODO the shape and electrical type are not handled yet
         rd.readFieldsInto(shape, value,
-          [null, 'name', 'number', 'x', 'y', 
+          [null, 'name', 'number', 'x', 'y',
           'length', 'orientation', 'numberDimension', 'nameDimension',
           'unit', 'convert', 'electricalType', 'shape'],
           [null, null, null, parseInt, parseInt,

@@ -4,7 +4,6 @@
 
 const fs = require('fs')
 const should = require('should')
-const EasyEdaBackend = require('../kicad/easyeda-backend')
 const KiCadLibReader = require('../kicad/kicad-lib-reader')
 
 describe('KiCadLibReader', () => {
@@ -61,7 +60,7 @@ describe('KiCadLibReader', () => {
   describe('#_readGraphic()', () => {
     let reader = new KiCadLibReader()
 
-        it('_readGraphic() polygon 1', () => {
+    it('_readGraphic() polygon 1', () => {
       let shape = reader._readGraphic('P 3 0 1 0 -50 50 50 0 -50 -50 F')
 
       shape.unit.should.equal(0)
@@ -71,8 +70,8 @@ describe('KiCadLibReader', () => {
 
       shape.points.should.eql([
         {x: -50, y: 50},
-        {x: 50, y: 0}, 
-        {x: -50, y:-50}])
+        {x: 50, y: 0},
+        {x: -50, y: -50}])
     })
 
     it('_readGraphic() rectangle', () => {
