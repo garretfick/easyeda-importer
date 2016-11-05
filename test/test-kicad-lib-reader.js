@@ -37,8 +37,11 @@ describe('KiCadLibReader', () => {
 
       libItem.should.have.property('packages')
       libItem.packages.should.be.array
+      libItem.packages.should.have.length(1)
       libItem.packages[0].should.equal('TO*')
-            // TODO test more properties
+
+      libItem.graphics.should.have.length(6)
+      // TODO test more properties
     })
   })
 
@@ -224,6 +227,12 @@ describe('KiCadLibReader', () => {
       shape.unit.should.equal(1)
       shape.convert.should.equal(1)
       shape.electricalType.should.equal('P')
+    })
+
+    it('_readGraphic() unknown type throws error', () => {
+      (() => {
+        reader._readGraphic('W ~ 2 0 250 200 U 40 40 1 1 P')
+      }).should.throw('Unknown graphic definition: W ~ 2 0 250 200 U 40 40 1 1 P')
     })
   })
 })

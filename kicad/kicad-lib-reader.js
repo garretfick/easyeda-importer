@@ -119,9 +119,12 @@ class KiCadLibReader {
       if (libraryData[index] === 'DRAW') {
         schlibDef.graphics = []
 
+        // Move to the first line in the draw section
+        index++
+
         // Read the inner draw section
-        while (!libraryData[index++].startsWith('ENDDRAW')) {
-          schlibDef.graphics.push(this._readGraphic(libraryData[index]))
+        while (!libraryData[index].startsWith('ENDDRAW')) {
+          schlibDef.graphics.push(this._readGraphic(libraryData[index++]))
         }
       }
 
@@ -258,6 +261,8 @@ class KiCadLibReader {
           parseInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
           parseInt, parseInt, null, null])
         break
+      default:
+        throw Error('Unknown graphic definition: ' + value)
     }
 
     return shape
