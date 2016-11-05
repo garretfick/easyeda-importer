@@ -8,134 +8,126 @@ const rd = require('./kicad-base-reader')
  * This is normally constructed by the KiCadReader
  */
 class KiCadLibReader {
-  constructor () {
-    this.backend = null
+  constructor() {
+    this.library = {}
   }
 
   /**
-   * Convert the schematic to EasyEDA format using the EasyEDA backend
-   * to generate the objects
+   * Read in the KiCad library into an internal format that we can later
+   * convert to EasyEDA format
    *
-   * @param {object} backend The backend for outputing the read data
+   * @param {string} source The read library data
    */
-  read (backend) {
-    this.backend = backend
+  read (source) {
+    this._readLines(source)
+    return this.library
   }
 
   /**
    * Evil function, but useful for testing for now
    */
   _readLines (library) {
-    try {
-      let libraryData = library.split('\n').map((line) => {
-        return line.trim()
-      })
-      return libraryData
-    } catch (e) {
-      console.log('Cannot read library data')
-      console.log(e)
-      return null
-    }
+    return library.split('\n').map((line) => {
+      return line.trim()
+    })
   }
 
-    /**
-     * Read a schematic file, calling the appropriate backend as encountering
-     * objects in the schematic
-     *
-     * @param {string} library The library contents to read
-     */
+  /**
+   * Read a schematic file into our internal data representation. We read this to
+   * a complete structure because EasyEDA doens't give a way to import libraries, so
+   * we will need to copy each instance we discover.
+   *
+   * @param {string} library The library contents to read
+   * 
+   * @return {object} The read library. The keys in the returned data are the
+   * names of compoents in the library. The values are the parsed data
+   */
   _readLibrary (library) {
     let libraryData = this._readLines(library)
-    if (libraryData) {
-            // Validate that we have found a library
-      if (libraryData.length <= 2 || !libraryData[0].startsWith('EESchema-LIBRARY Version 2.')) {
-        throw Error('Contents are not a KiCad library or are not a supported version')
-      }
 
-            // Start from the second line (index = 1) to skip the file header
-      for (let index = 1; index < libraryData.length; ++index) {
-        let line = libraryData[index]
-
-        // Each line is one of a few different types, all keyed based on the beginning
-        // of the line
-        if (line.startsWith('#')) {
-          continue
-        } else if (line.startsWith('DEF')) {
-          index = this._readComponent(libraryData, index)
-        } else if (line.length !== 0) {
-          console.log('Unknown file contents: ' + line)
-        }
-      }
-    } else {
-      console.log('No library data to read')
+    // Validate that we have found a library
+    if (libraryData.length <= 2 || !libraryData[0].startsWith('EESchema-LIBRARY Version 2.')) {
+      throw Error('Contents are not a KiCad library or are not a supported version')
     }
+
+    // Start from the second line (index = 1) to skip the file header
+    for (let index = 1; index < libraryData.length; ++index) {
+      let line = libraryData[index]
+
+      // Each line is one of a few different types, all keyed based on the beginning
+      // of the line
+      if (line.startsWith('#')) {
+        continue
+      } else if (line.startsWith('DEF')) {
+        index = this._readComponent(libraryData, index)
+      } else if (line.length !== 0) {
+        console.log('Unknown file contents: ' + line)
+      }
+    }
+
+    return this.library
   }
 
   /**
    * @param {array} libraryData
    */
   _readComponent (libraryData, index) {
-    try {
-      // TODO small bug where if we cannot create the context, then
-      // TODO in the finally, we will release a context that we didn't create
-      this.backend.beginSchLibContext()
+    let schlibDef = {}
 
-      let schlibDef = {}
+    rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
+              'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
+              'units_locked', 'option_flag'
+          ], [null, null, null, null,
+              null, rd.parseYN, rd.parseYN, parseInt,
+              KiCadLibReader._parseIsIdenticalUnits, KiCadLibReader._parseIsPower
+          ])
 
-      rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
-                'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
-                'units_locked', 'option_flag'
-            ], [null, null, null, null,
-                null, rd.parseYN, rd.parseYN, parseInt,
-                KiCadLibReader._parseIsIdenticalUnits, KiCadLibReader._parseIsPower
-            ])
-
-      if (libraryData[index].startsWith('ALIAS')) {
-        schlibDef.aliases = rd.readFieldsIntoArray(libraryData[index++], 1)
-      } else {
-        schlibDef.aliases = []
-      }
-
-      // Read the field values until we don't have any more
-      while (libraryData[index][0] === 'F') {
-        // TODO properly handle these
-        this._readLibraryField(libraryData[index], schlibDef)
-        index++
-      }
-
-      // Handle the $FPLIST, which is a list of footprint names for the component
-      if (libraryData[index].startsWith('$FPLIST')) {
-        let extraPackageNames = []
-        while (libraryData[++index] !== '$ENDFPLIST') {
-          extraPackageNames.push(libraryData[index].trim())
-        }
-        schlibDef.packages = extraPackageNames
-      }
-
-      // Read forward until the DRAW section, in case there are things we don't
-      // understand
-      index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
-
-      if (libraryData[index] === 'DRAW') {
-        schlibDef.graphics = []
-
-        // Move to the first line in the draw section
-        index++
-
-        // Read the inner draw section
-        while (!libraryData[index].startsWith('ENDDRAW')) {
-          schlibDef.graphics.push(this._readGraphic(libraryData[index++]))
-        }
-      }
-
-      // Read until the end of the component
-      index = rd.indexOfAny(['ENDDEF'], libraryData, index)
-
-      this.backend.update(schlibDef)
-    } finally {
-            // We always need to release the context we created
-      this.backend.endSchLibContext()
+    if (libraryData[index].startsWith('ALIAS')) {
+      schlibDef.aliases = rd.readFieldsIntoArray(libraryData[index++], 1)
+    } else {
+      schlibDef.aliases = []
     }
+
+    // Read the field values until we don't have any more
+    while (libraryData[index][0] === 'F') {
+      // TODO properly handle these
+      this._readLibraryField(libraryData[index], schlibDef)
+      index++
+    }
+
+    // Handle the $FPLIST, which is a list of footprint names for the component
+    if (libraryData[index].startsWith('$FPLIST')) {
+      let extraPackageNames = []
+      while (libraryData[++index] !== '$ENDFPLIST') {
+        extraPackageNames.push(libraryData[index].trim())
+      }
+      schlibDef.packages = extraPackageNames
+    }
+
+    // Read forward until the DRAW section, in case there are things we don't
+    // understand
+    index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
+
+    if (libraryData[index] === 'DRAW') {
+      schlibDef.graphics = []
+
+      // Move to the first line in the draw section
+      index++
+
+      // Read the inner draw section
+      while (!libraryData[index].startsWith('ENDDRAW')) {
+        schlibDef.graphics.push(this._readGraphic(libraryData[index++]))
+      }
+    }
+
+    // Read until the end of the component
+    index = rd.indexOfAny(['ENDDEF'], libraryData, index)
+
+    // Add to ourselves as the parsed data
+    if (this.library.hasOwnProperty(schlibDef.name)) {
+      throw Error('Library has more than one definition for ' + schlibDef.name)
+    }
+    this.library[schlibDef.name] = schlibDef
 
     return index
   }

@@ -1,5 +1,7 @@
 'use strict'
 
+const KiCadLibReader = require('./kicad-lib-reader')
+
 /**
  * Reader for the Kicad schematic format.
  *
@@ -15,7 +17,18 @@ class KiCadReader
     this.schematicLibs = []
   }
 
-  addLibrarySource () {
+  /**
+   * Add the library to the reader. You should add required libraries to the reader
+   * prior to reading a schematic
+   * 
+   * @param {string} source The read library contents
+   * 
+   * @param {string} name The name of the library (usually this is the file name without the extension).
+   * This name is used to find the library when reading schematics
+   */
+  addLibrarySource (source, name) {
+    let libReader = new KiCadLibReader()
+    libReader.read(source)
 
   }
 
@@ -28,12 +41,30 @@ class KiCadReader
     this.schematics.push(source)
   }
 
-    /**
-     * Convert the schematic to EasyEDA format using the EasyEDA backend
-     * to generate the objects
-     *
-     * @param {object} backend The backend for outputing the read data
-     */
+  /**
+   * Convert a library into EasyEDA schematic. Use this to import the entire contents of a KiCAD
+   * library into an EasyEDA schematic. This will import the library by placing all components
+   * in the library into a schematic.
+   * 
+   * You must have first added the library source to the reader (see KiCadReader.addLibrarySource)
+   * 
+   * For example:
+   * 
+   * reader = new KiCadReader()
+   * reader.addLibrarySource(stream, 'OPAMPS')
+   * reader.libraryToSchematic('OPAMPS')
+   * reader.getSchematic()
+   */
+  libraryToSchematic (libraryName) {
+
+  }
+
+  /**
+   * Convert the schematic to EasyEDA format using the EasyEDA backend
+   * to generate the objects
+   *
+   * @param {object} backend The backend for outputing the read data
+   */
   read (backend) {
     this.backend = backend
 

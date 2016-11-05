@@ -207,10 +207,6 @@ class EasyEdaBackend {
   getSchematic () {
     return this.root
   }
-
-  getRoot () {
-    return this.root
-  }
 }
 
 module.exports = EasyEdaBackend

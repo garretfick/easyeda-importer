@@ -9,30 +9,19 @@ const KiCadLibReader = require('../kicad/kicad-lib-reader')
 
 describe('KiCadLibReader', () => {
   describe('#_readLibrary()', () => {
-    let backend = null
     let reader = null
 
     beforeEach(() => {
-            // We need a new reader and backend with each test
-      backend = new EasyEdaBackend()
-                // For these tests, we are reading individual components
-                // so we just need the schlib container context that owns
-                // the read components
-      backend.beginSchLibContainerContext()
-
       reader = new KiCadLibReader()
-      reader.backend = backend
     })
 
     it('_readLibrary() read library with one component', () => {
       let libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
-      reader._readLibrary(libContents)
+      let library = reader._readLibrary(libContents)
 
-      let root = backend.getRoot()
+      library.should.have.property('LM1875')
 
-      root.should.have.property('LM1875')
-
-      let libItem = root['LM1875']
+      let libItem = library['LM1875']
       libItem.should.have.property('aliases')
 
       libItem.should.have.property('packages')
