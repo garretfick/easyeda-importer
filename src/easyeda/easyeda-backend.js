@@ -133,10 +133,19 @@ class EasyEdaBackend {
     return this
   }
 
-  object (object, typeName) {
+  /**
+   * Add a DrawingObject into the context
+   *
+   * @param {DrawingObject} drawingObject The object to add
+   */
+  addDrawingObject (drawingObject) {
     let identifier = this._nextIdentifier()
 
-    this._addObject(object, identifier, typeName)
+    // Get the primitives only represetation of the object
+    let objectType = drawingObject.__type
+    let primitives = drawingObject.toPrimitives()
+
+    this._addObject(primitives, identifier, objectType)
 
     return this
   }

@@ -11,10 +11,8 @@ class RootDrawingObject extends DrawingObject
 {
   constructor () {
     super()
-    this.data = {
-      some: {dummy: 'data'},
-      other: ['array', 1]
-    }
+    this.some = {dummy: 'data'}
+    this.other = ['array', 1]
   }
 }
 
@@ -25,10 +23,8 @@ class ParentDrawingObject extends DrawingObject
 {
   constructor () {
     super()
-    this.data = {
-      something: {no: 'convert'},
-      other: new RootDrawingObject()
-    }
+    this.something = {no: 'convert'}
+    this.other = new RootDrawingObject()
   }
 }
 

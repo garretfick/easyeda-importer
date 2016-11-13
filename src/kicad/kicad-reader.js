@@ -2,6 +2,7 @@
 
 const rd = require('./kicad-base-reader')
 const KiCadLibReader = require('./kicad-lib-reader')
+const EasyEdaFactory = require('../easyeda/easyeda-factory')
 
 /**
  * Reader for the Kicad schematic format.
@@ -16,6 +17,7 @@ class KiCadReader
     this.backend = null
     this.schematics = []
     this.schematicLibs = {}
+    this.factory = new EasyEdaFactory()
   }
 
   /**
@@ -28,7 +30,7 @@ class KiCadReader
    * This name is used to find the library when reading schematics
    */
   addLibrarySource (source, name) {
-    let libReader = new KiCadLibReader()
+    let libReader = new KiCadLibReader(this.factory)
     let library = libReader.read(source)
 
     this.schematicLibs[name] = library
@@ -238,7 +240,7 @@ class KiCadReader
 
       for (let graphic in component.graphics) {
         let graphicItem = component.graphics[graphic]
-        this.backend.object(graphicItem, graphicItem.type)
+        this.backend.addDrawingObject(graphicItem, graphicItem.type)
       }
     } finally {
       this.backend.endSchComponentContext()

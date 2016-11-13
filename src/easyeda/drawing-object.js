@@ -15,7 +15,7 @@ class DrawingObject
    * @return {object} The object hierarchy to convert
    */
   _primitiveData () {
-    return this.data
+    return this
   }
 
   /**
@@ -40,6 +40,12 @@ class DrawingObject
 
   _objectToPrimitives (data) {
     for (let member in data) {
+      // Skip all items that begin with __ as internal only, not convertable
+      if (member.startsWith('__')) {
+        delete data[member]
+        continue
+      }
+
       let value = data[member]
       if (Array.isArray(value)) {
         for (let index = 0; index < value.length; ++index) {

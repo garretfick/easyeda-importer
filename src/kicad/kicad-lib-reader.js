@@ -8,8 +8,14 @@ const rd = require('./kicad-base-reader')
  * This is normally constructed by the KiCadReader
  */
 class KiCadLibReader {
-  constructor () {
+  /**
+   * Create the KiCadLibReader
+   *
+   * @param {EasyEdaFactory} factory Factory to create required objects
+   */
+  constructor (factory) {
     this.library = {}
+    this.factory = factory
   }
 
   /**
@@ -181,17 +187,17 @@ class KiCadLibReader {
       case 'P':
         // Nb parts convert thickness x0 y0 x1 y1 ... xi yi cc
 
-        shape.type = 'polygon'
+        shape = this.factory.createPolygon()
 
-        // Read in the first part before the variable length section
+        // Read in the first part before the variable length section.
         let fields = value.split(' ')
         rd.readSplitFieldsInfo(shape, fields,
-          [null, 'numPoints', 'unit', 'convert', 'thickness'],
-          [null, parseInt, parseInt, parseInt, parseInt])
+          [null, '__kicad_numPoints', '__kicad_unit', '__kicad_convert', 'strokeWidth'],
+          [null, parseInt, null, null, KiCadLibReader._parseWidth])
 
         // Now the variable points, two at a time, starting at the 5th item
         // which is where the points begin
-        let lastValIndex = 5 + shape.numPoints * 2
+        let lastValIndex = 5 + shape.__kicad_numPoints * 2
         let points = []
         for (let valIndex = 5; valIndex < lastValIndex; valIndex += 2) {
           points.push({
@@ -201,10 +207,10 @@ class KiCadLibReader {
         }
 
         // Set the points in our shape
-        shape.points = points
+        shape.pointArr = points
 
         // Finally, the last item is the fill
-        shape.filled = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
+        shape.fillColor = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
         break
       case 'S':
         // S startx starty endx endy unit convert thickness cc
@@ -213,10 +219,10 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'startx', 'starty', 'endx',
-          'endy', 'unit', 'convert', 'thickness',
+          'endy', '__kicad_unit', '__kicad_convert', 'thickness',
           'filled'],
           [null, parseInt, parseInt, parseInt,
-          parseInt, parseInt, parseInt, parseInt,
+          parseInt, null, null, parseInt,
           KiCadLibReader._parseFillStyle])
         break
       case 'C':
@@ -226,9 +232,9 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
-          'unit', 'convert', 'thickness', 'filled'],
+          '__kicad_unit', '__kicad_convert', 'thickness', 'filled'],
           [null, parseInt, parseInt, parseInt,
-          parseInt, parseInt, parseInt, KiCadLibReader._parseFillStyle])
+          null, null, parseInt, KiCadLibReader._parseFillStyle])
         break
       case 'A':
         // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
@@ -237,11 +243,11 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
-          'startAngle', 'endAngle', 'unit', 'convert',
+          'startAngle', 'endAngle', '__kicad_unit', '__kicad_convert',
           'thickness', 'filled', 'startPointX', 'startPointY',
           'endPointX', 'endPointY'],
           [null, parseInt, parseInt, parseInt,
-          rd.parseTenthDegreesToDegrees, rd.parseTenthDegreesToDegrees, parseInt, parseInt,
+          rd.parseTenthDegreesToDegrees, rd.parseTenthDegreesToDegrees, null, null,
           parseInt, KiCadLibReader._parseFillStyle, parseInt, parseInt,
           parseInt, parseInt])
         break
@@ -252,9 +258,9 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'orientation', 'x', 'y',
-          'dimension', 'unit', 'convert', 'text'],
+          'dimension', '__kicad_unit', '__kicad_convert', 'text'],
           [null, KiCadLibReader._parseTextOrientation, parseInt, parseInt,
-          parseInt, parseInt, parseInt, null])
+          parseInt, null, null, null])
         break
       case 'X':
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
@@ -262,17 +268,23 @@ class KiCadLibReader {
 
         shape.type = 'pin'
 
-        rd.readFieldsInto(shape, value,
+        let pin = this.factory.createPin()
+
+        rd.readFieldsInto(pin, value,
           [null, 'name', 'number', 'x', 'y',
           'length', 'orientation', 'numberDimension', 'nameDimension',
-          'unit', 'convert', 'electricalType', 'shape'],
+          '__kicad_unit', '__kicad_convert', 'electricalType', 'shape'],
           [null, null, null, parseInt, parseInt,
           parseInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
-          parseInt, parseInt, null, null])
+          null, null, null, null])
+
+        shape = pin
         break
       default:
         throw Error('Unknown graphic definition: ' + value)
     }
+
+    KiCadLibReader._validateUnitConvert(shape)
 
     return shape
   }
@@ -316,7 +328,26 @@ class KiCadLibReader {
    * @private
    */
   static _parseFillStyle (value) {
-    return rd.parseOptions(value, { F: true, f: true, N: false })
+    return rd.parseOptions(value, { F: '#000000', f: '#000000', N: 'none' })
+  }
+
+  static _parseWidth (value) {
+    // TODO convert width values
+    return parseInt(value)
+  }
+
+  /**
+   * Check that the unit and convert values are supported by EasyEDA, or throw an Error
+   * @param {object} shape The shape object to check
+   */
+  static _validateUnitConvert (shape) {
+    if (shape.__kicad_unit !== '0' && shape.__kicad_unit !== '1') {
+      throw new Error('Cannot convert shape with unit ' + shape.__kicad_unit + ' because EasyEDA does not support multiple units')
+    }
+
+    if (shape.__kicad_convert !== '0' && shape.__kicad_convert !== '1') {
+      throw new Error('Cannot convert shape with convert ' + shape.__kicad_convert + ' because EasyEDA does not support DeMorgan units')
+    }
   }
 
   _convertPoint (data, xName = 'x', yName = 'y') {

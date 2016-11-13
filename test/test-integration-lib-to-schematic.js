@@ -52,6 +52,14 @@ describe('Integration library to schematic', () => {
       // tests
       const pin = component.pin[Object.keys(component.pin)[0]]
       pin.should.have.properties(['clock', 'configure', 'dot', 'name', 'num', 'path', 'pinDot'])
+
+      // Validate the polygon - there should be one
+      component.should.have.property('polygon').have.size(1)
+      // Now validate the polygon - just doing basic validation that
+      // this is in fact a polygon. We validate the structure of a polygon
+      // in other tests
+      const polygon = component.polygon[Object.keys(component.polygon)[0]]
+      polygon.should.have.properties(['fillColor', 'pointArr', 'strokeColor', 'strokeStyle', 'strokeWidth'])
     })
   })
 })

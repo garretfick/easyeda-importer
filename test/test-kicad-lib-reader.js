@@ -5,13 +5,14 @@
 const fs = require('fs')
 const should = require('should')
 const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
+const EasyEdaFactory = require('../src/easyeda/easyeda-factory')
 
 describe('KiCadLibReader', () => {
   describe('#_readLibrary()', () => {
     let reader = null
 
     beforeEach(() => {
-      reader = new KiCadLibReader()
+      reader = new KiCadLibReader(new EasyEdaFactory())
     })
 
     it('_readLibrary() read library with one component', () => {
@@ -34,7 +35,7 @@ describe('KiCadLibReader', () => {
   })
 
   describe('#_readLibraryField()', () => {
-    let reader = new KiCadLibReader()
+    let reader = new KiCadLibReader(new EasyEdaFactory())
 
     it('_readLibraryField() simple value', () => {
       let field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
@@ -58,17 +59,17 @@ describe('KiCadLibReader', () => {
   })
 
   describe('#_readGraphic()', () => {
-    let reader = new KiCadLibReader()
+    let reader = new KiCadLibReader(new EasyEdaFactory())
 
     it('_readGraphic() polygon 1', () => {
       let shape = reader._readGraphic('P 3 0 1 0 -50 50 50 0 -50 -50 F')
 
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
-      shape.thickness.should.equal(0)
-      shape.filled.should.be.true
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
+      shape.strokeWidth.should.equal(0)
+      shape.fillColor.should.be.true
 
-      shape.points.should.eql([
+      shape.pointArr.should.eql([
         {x: -50, y: 50},
         {x: 50, y: 0},
         {x: -50, y: -50}])
@@ -81,8 +82,8 @@ describe('KiCadLibReader', () => {
       shape.starty.should.equal(50)
       shape.endx.should.equal(900)
       shape.endy.should.equal(900)
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
       shape.thickness.should.equal(0)
       shape.filled.should.be.false
     })
@@ -93,8 +94,8 @@ describe('KiCadLibReader', () => {
       shape.x.should.equal(0)
       shape.y.should.equal(50)
       shape.radius.should.equal(70)
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
       shape.thickness.should.equal(0)
       shape.filled.should.be.true
     })
@@ -107,8 +108,8 @@ describe('KiCadLibReader', () => {
       shape.radius.should.equal(49)
       shape.startAngle.should.equal(90.0)
       shape.endAngle.should.equal(-1.1)
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
       shape.thickness.should.equal(0)
       shape.filled.should.be.false
       shape.startPointX.should.equal(-50)
@@ -125,8 +126,8 @@ describe('KiCadLibReader', () => {
       shape.radius.should.equal(49)
       shape.startAngle.should.equal(0)
       shape.endAngle.should.equal(-91.1)
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
       shape.thickness.should.equal(0)
       shape.filled.should.be.false
       shape.startPointX.should.equal(0)
@@ -143,8 +144,8 @@ describe('KiCadLibReader', () => {
       shape.x.should.equal(-320)
       shape.y.should.equal(-10)
       shape.dimension.should.equal(100)
-      shape.unit.should.equal(0)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('0')
+      shape.__kicad_convert.should.equal('1')
       shape.text.should.equal('VREF')
     })
 
@@ -160,8 +161,8 @@ describe('KiCadLibReader', () => {
       shape.orientation.should.equal('R')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
-      shape.unit.should.equal(1)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('1')
+      shape.__kicad_convert.should.equal('1')
       shape.electricalType.should.equal('P')
     })
 
@@ -177,12 +178,12 @@ describe('KiCadLibReader', () => {
       shape.orientation.should.equal('L')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
-      shape.unit.should.equal(1)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('1')
+      shape.__kicad_convert.should.equal('1')
       shape.electricalType.should.equal('P')
     })
 
-    it('_readGraphic() pin 2', () => {
+    it('_readGraphic() pin 3', () => {
       let shape = reader._readGraphic('X 0 1 0 0 0 R 40 40 1 1 W NC')
 
       // TODO this orientation is not handled correctly
@@ -194,13 +195,13 @@ describe('KiCadLibReader', () => {
       shape.orientation.should.equal('R')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
-      shape.unit.should.equal(1)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('1')
+      shape.__kicad_convert.should.equal('1')
       shape.electricalType.should.equal('W')
       shape.shape.should.equal('NC')
     })
 
-    it('_readGraphic() pin 2', () => {
+    it('_readGraphic() pin 4', () => {
       let shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
 
       // TODO this orientation is not handled correctly
@@ -212,8 +213,8 @@ describe('KiCadLibReader', () => {
       shape.orientation.should.equal('U')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
-      shape.unit.should.equal(1)
-      shape.convert.should.equal(1)
+      shape.__kicad_unit.should.equal('1')
+      shape.__kicad_convert.should.equal('1')
       shape.electricalType.should.equal('P')
     })
 

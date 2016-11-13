@@ -1,6 +1,7 @@
 'use strict'
 
 const Pin = require('./pin')
+const Polygon = require('./polygon')
 const SchLib = require('./schlib')
 
 /**
@@ -12,8 +13,12 @@ class EasyEdaFactory
     return new Pin()
   }
 
+  createPolygon () {
+    return new Polygon()
+  }
+
   createComponent () {
-    return new ShcLib()
+    return new SchLib()
   }
 
   createSchematic () {

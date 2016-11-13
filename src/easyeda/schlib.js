@@ -6,13 +6,11 @@
 class SchLib
 {
   constructor () {
-    this.data =  {
-      head: {
-        c_para: '',
-        importFlag: 0
-      },
-      itemOrder: []
+    this.head = {
+      c_para: '',
+      importFlag: 0
     }
+    this.itemOrder = []
   }
 }
 

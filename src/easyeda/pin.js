@@ -9,6 +9,8 @@ class Pin extends DrawingObject
 {
   constructor () {
     super()
+    this.__type = 'pin'
+
     this.data = {
       clock: {
         pathString: '',
@@ -60,11 +62,22 @@ class Pin extends DrawingObject
   }
 
   /**
+   * Override parent primtive data since we store this in a nested member
+   */
+  _primitiveData () {
+    return this.data
+  }
+
+  /**
    * Set the pin name
    * @param {string} name The new name
    */
   set name (name) {
     this.data.name.text = name
+  }
+
+  get name () {
+    return this.data.name.text
   }
 
   /**
@@ -73,6 +86,10 @@ class Pin extends DrawingObject
    */
   set number (number) {
     this.data.num.text = number
+  }
+
+  get number () {
+    return this.data.num.text
   }
 }
 
