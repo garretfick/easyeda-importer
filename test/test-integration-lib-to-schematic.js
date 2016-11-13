@@ -38,7 +38,7 @@ describe('Integration library to schematic', () => {
       schematic.schlib.should.have.property(itemId)
 
       const component = schematic.schlib[itemId]
-      
+
       // Validate the head element
       component.head.should.have.property('gId').which.equal(itemId)
       component.head.should.have.property('x').which.equal('0')

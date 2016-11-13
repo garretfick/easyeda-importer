@@ -181,7 +181,7 @@ class KiCadLibReader {
    */
   _readGraphic (value) {
     let graphicType = value[0]
-    let shape = {}
+    let shape = null
 
     switch (graphicType) {
       case 'P':
@@ -214,32 +214,40 @@ class KiCadLibReader {
         break
       case 'S':
         // S startx starty endx endy unit convert thickness cc
+        shape = this.factory.createRect()
 
-        shape.type = 'rect'
-
+        // We have a problem here because EasyEDA stores width and height, and
+        // ensures that they are positive values. KiCAD can essentially have negative
+        // width and height because of the ordering of start and end values
         rd.readFieldsInto(shape, value,
-          [null, 'startx', 'starty', 'endx',
-          'endy', '__kicad_unit', '__kicad_convert', 'thickness',
-          'filled'],
+          [null, '__kicad_startx', '__kicad_starty', '__kicad_endx',
+          '__kicad_endy', '__kicad_unit', '__kicad_convert', 'strokeWidth',
+          'fillColor'],
           [null, parseInt, parseInt, parseInt,
-          parseInt, null, null, parseInt,
+          parseInt, null, null, KiCadLibReader._parseWidth,
           KiCadLibReader._parseFillStyle])
+
+        // TODO knowing that this needs to be a string makes me unhappy here
+        shape.left = Math.min(shape.__kicad_startx, shape.__kicad_endx)
+        shape.width = Math.abs(shape.__kicad_startx - shape.__kicad_endx).toString()
+        shape.bottom = Math.min(shape.__kicad_starty, shape.__kicad_endy)
+        shape.height = Math.abs(shape.__kicad_starty - shape.__kicad_endy).toString()
         break
       case 'C':
         // C posx posy radius unit convert thickness cc
 
-        shape.type = 'circle'
+        shape = this.factory.createEllipse()
 
         rd.readFieldsInto(shape, value,
-          [null, 'x', 'y', 'radius',
-          '__kicad_unit', '__kicad_convert', 'thickness', 'filled'],
-          [null, parseInt, parseInt, parseInt,
-          null, null, parseInt, KiCadLibReader._parseFillStyle])
+          [null, 'cx', 'cy', 'radius',
+          '__kicad_unit', '__kicad_convert', 'strokeWidth', 'fillColor'],
+          [null, KiCadLibReader._parseLength, KiCadLibReader._parseLength, KiCadLibReader._parseLength,
+          null, null, KiCadLibReader._parseWidth, KiCadLibReader._parseFillStyle])
         break
       case 'A':
         // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
 
-        shape.type = 'arc'
+        shape = this.factory.createArc()
 
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
@@ -254,19 +262,17 @@ class KiCadLibReader {
       case 'T':
         // T orientation posx posy dimension unit convert Text
 
-        shape.type = 'text'
+        shape = this.factory.createAnnotation()
 
         rd.readFieldsInto(shape, value,
           [null, 'orientation', 'x', 'y',
-          'dimension', '__kicad_unit', '__kicad_convert', 'text'],
-          [null, KiCadLibReader._parseTextOrientation, parseInt, parseInt,
+          'dimension', '__kicad_unit', '__kicad_convert', 'value'],
+          [null, KiCadLibReader._parseTextOrientation, KiCadLibReader._parseLength, KiCadLibReader._parseLengths,
           parseInt, null, null, null])
         break
       case 'X':
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
         // TODO the shape and electrical type are not handled yet
-
-        shape.type = 'pin'
 
         let pin = this.factory.createPin()
 
@@ -333,7 +339,11 @@ class KiCadLibReader {
 
   static _parseWidth (value) {
     // TODO convert width values
-    return parseInt(value)
+    return parseInt(value).toString()
+  }
+
+  static _parseLength (value) {
+    return parseInt(value).toString()
   }
 
   /**

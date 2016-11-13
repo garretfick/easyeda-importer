@@ -66,8 +66,8 @@ describe('KiCadLibReader', () => {
 
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.strokeWidth.should.equal(0)
-      shape.fillColor.should.be.true
+      shape.strokeWidth.should.equal('0')
+      shape.fillColor.should.equal('#000000')
 
       shape.pointArr.should.eql([
         {x: -50, y: 50},
@@ -78,26 +78,27 @@ describe('KiCadLibReader', () => {
     it('_readGraphic() rectangle', () => {
       let shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
 
-      shape.startx.should.equal(0)
-      shape.starty.should.equal(50)
-      shape.endx.should.equal(900)
-      shape.endy.should.equal(900)
+      shape.x.should.equal('0')
+      shape.y.should.equal('50')
+      shape.width.should.equal('900')
+      shape.height.should.equal('850')
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.thickness.should.equal(0)
-      shape.filled.should.be.false
+      shape.strokeWidth.should.equal('0')
+      shape.fillColor.should.equal('#000000')
     })
 
     it('_readGraphic() circle', () => {
       let shape = reader._readGraphic('C 0 50 70 0 1 0 F')
 
-      shape.x.should.equal(0)
-      shape.y.should.equal(50)
-      shape.radius.should.equal(70)
+      shape.cx.should.equal('0')
+      shape.cy.should.equal('50')
+      shape.rx.should.equal('70')
+      shape.ry.should.equal('70')
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.thickness.should.equal(0)
-      shape.filled.should.be.true
+      shape.strokeWidth.should.equal('0')
+      shape.fillColor.should.equal('#000000')
     })
 
     it('_readGraphic() arc 1', () => {
@@ -141,12 +142,12 @@ describe('KiCadLibReader', () => {
 
       // TODO this orientation is not handled correctly
       shape.orientation.should.equal('0')
-      shape.x.should.equal(-320)
-      shape.y.should.equal(-10)
+      shape.x.should.equal('-320')
+      shape.y.should.equal('-10')
       shape.dimension.should.equal(100)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.text.should.equal('VREF')
+      shape.value.should.equal('VREF')
     })
 
     it('_readGraphic() pin 1', () => {

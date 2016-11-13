@@ -1,11 +1,11 @@
 'use strict'
 
-const DrawingObject = require('./drawing-object')
+const SimpleShape = require('./simple-shape')
 
 /**
  * Polygon shape
  */
-class Polygon extends DrawingObject
+class Polygon extends SimpleShape
 {
   constructor () {
     super()
@@ -13,12 +13,8 @@ class Polygon extends DrawingObject
     // in the parent this populates
     this.__type = 'polygon'
 
-    this.fillColor = 'none'
     // {x: 0, y:0}
     this.pointArr = []
-    this.strokeColor = '#000000'
-    this.strokeStyle = 0
-    this.strokeWidth = 1
   }
 }
 
