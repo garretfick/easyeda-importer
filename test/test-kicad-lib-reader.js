@@ -4,7 +4,7 @@
 
 const fs = require('fs')
 const should = require('should')
-const KiCadLibReader = require('../kicad/kicad-lib-reader')
+const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
 
 describe('KiCadLibReader', () => {
   describe('#_readLibrary()', () => {

@@ -181,6 +181,8 @@ class KiCadLibReader {
       case 'P':
         // Nb parts convert thickness x0 y0 x1 y1 ... xi yi cc
 
+        shape.type = 'polygon'
+
         // Read in the first part before the variable length section
         let fields = value.split(' ')
         rd.readSplitFieldsInfo(shape, fields,
@@ -206,6 +208,9 @@ class KiCadLibReader {
         break
       case 'S':
         // S startx starty endx endy unit convert thickness cc
+
+        shape.type = 'rect'
+
         rd.readFieldsInto(shape, value,
           [null, 'startx', 'starty', 'endx',
           'endy', 'unit', 'convert', 'thickness',
@@ -216,6 +221,9 @@ class KiCadLibReader {
         break
       case 'C':
         // C posx posy radius unit convert thickness cc
+
+        shape.type = 'circle'
+
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
           'unit', 'convert', 'thickness', 'filled'],
@@ -224,6 +232,9 @@ class KiCadLibReader {
         break
       case 'A':
         // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
+
+        shape.type = 'arc'
+
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
           'startAngle', 'endAngle', 'unit', 'convert',
@@ -236,6 +247,9 @@ class KiCadLibReader {
         break
       case 'T':
         // T orientation posx posy dimension unit convert Text
+
+        shape.type = 'text'
+
         rd.readFieldsInto(shape, value,
           [null, 'orientation', 'x', 'y',
           'dimension', 'unit', 'convert', 'text'],
@@ -245,6 +259,9 @@ class KiCadLibReader {
       case 'X':
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
         // TODO the shape and electrical type are not handled yet
+
+        shape.type = 'pin'
+
         rd.readFieldsInto(shape, value,
           [null, 'name', 'number', 'x', 'y',
           'length', 'orientation', 'numberDimension', 'nameDimension',

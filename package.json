@@ -4,7 +4,7 @@
     "description": "Importer for file into EasyEDA",
     "main": "index.js",
     "scripts": {
-        "test": "./node_modules/.bin/mocha",
+        "test": "./node_modules/.bin/mocha test/**/*.js",
         "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha  --report lcovonly -- --check-leaks",
         "dist": "./node_modules/.bin/webpack",
         "lint": "./node_modules/.bin/standard"

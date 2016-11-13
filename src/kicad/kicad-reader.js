@@ -1,5 +1,6 @@
 'use strict'
 
+const rd = require('./kicad-base-reader')
 const KiCadLibReader = require('./kicad-lib-reader')
 
 /**
@@ -30,7 +31,7 @@ class KiCadReader
     let libReader = new KiCadLibReader()
     let library = libReader.read(source)
 
-    this.schematicLibs['name'] = library
+    this.schematicLibs[name] = library
   }
 
   /**
@@ -58,6 +59,13 @@ class KiCadReader
    */
   libraryToSchematic (libraryName) {
     this.backend.beginSchematicContext()
+
+    // Get the library from the read libraries
+    let library = this.schematicLibs[libraryName]
+    for (let name in library) {
+      let component = library[name]
+      this._convertLibraryComponent(component)
+    }
 
     this.backend.endSchematicContext()
   }
@@ -133,15 +141,15 @@ class KiCadReader
     }
   }
 
-    /**
-     * Reads schematic text entry.
-     *
-     * @return int The ending line of the text entry. The reader should begin at the
-     * line following this line
-     */
+  /**
+   * Reads schematic text entry.
+   *
+   * @return int The ending line of the text entry. The reader should begin at the
+   * line following this line
+   */
   _readSchText (schematicData, index) {
     let textData = {}
-    this._readFieldsInto(textData, schematicData[index++],
+    rd.readFieldsInto(textData, schematicData[index++],
       [null, 'type', 'x', 'y', 'angle', 'dimension'],
       [null, null, parseInt, parseInt, null, null]
       )
@@ -163,16 +171,16 @@ class KiCadReader
 
     // Read the name reference
     let componentDef = {}
-    this._readFieldsInto(componentDef, schematicData[index++],
+    rd.readFieldsInto(componentDef, schematicData[index++],
       [null, 'name', 'ref'])
 
     // Read the unit line (for schematic symbols that have multiple units)
     // TODO Not sure if this is correct
-    this._readFieldsInto(componentDef, schematicData[index++],
+    rd.readFieldsInto(componentDef, schematicData[index++],
       [null, 'unit', 'mm'])
 
     // Read the position line
-    this._readFieldsInto(componentDef, schematicData[index++],
+    rd.readFieldsInto(componentDef, schematicData[index++],
       [null, 'x', 'y'],
       [null, parseInt, parseInt])
 
@@ -188,7 +196,7 @@ class KiCadReader
     let wireDef = {}
     // Increment before since we want to skip the first line
     // AFterward, we are on the final line of the wire
-    this._readFieldsInto(wireDef, schematicData[++index],
+    rd.readFieldsInto(wireDef, schematicData[++index],
       ['startX', 'startY', 'endX', 'endY'],
       [parseInt, parseInt, parseInt, parseInt])
 
@@ -205,7 +213,7 @@ class KiCadReader
     let junctionDef = {}
     // The connection is specified on a single line, so increment afterward.
     // We are already on the line of interest
-    this._readFieldsInto(junctionDef, schematicData[index++],
+    rd.readFieldsInto(junctionDef, schematicData[index++],
       [null, null, 'x', 'y'],
       [null, null, parseInt, parseInt])
 
@@ -215,46 +223,26 @@ class KiCadReader
   }
 
   /**
-   * Reads a line containing space separated fields into the data object.
+   * Convert the component definition (from the library) into the format
+   * for EasyEDA
    *
-   * @param targetObject The object to read into.
-   *
-   * @param line The line to read.
-   *
-   * @param fieldIdentifiers Array of field names. The index of the field names matches
-   * the index of the field in the line. If the field should not be added to the object,
-   * set the value at index to null.
-   *
-   * @param fieldTypeConverters Array of function to convert the field values. The index
-   * of the field type converters matches the index of the filed in the line. If the field
-   * should not be converted, set the value at the index to null. If null, then do not
-   * use type conversion.
-   *
-   * @return The modified object. The object is converted in place, so this is only necessary
-   * to use as a fluent API
+   * @param {object} component The component to convert
    */
-  _readFieldsInto (targetObject, line, fieldIdentifiers, fieldTypeConverters) {
-    let lineFields = line.split(' ')
-    let maxField = Math.min(lineFields.length, fieldIdentifiers.length)
-    for (let index = 0; index < maxField; ++index) {
-      let value = lineFields[index]
+  _convertLibraryComponent (component) {
+    try {
+      let libComponent = this.backend.beginSchComponentContext()
 
-      // If the field name is null, then skip it. We don't need the value
-      let fieldName = fieldIdentifiers[index]
-      if (!fieldName) {
-        continue
+      // TODO This might be wrong - it needs to be checked later
+      libComponent.head.x = '0'
+      libComponent.head.y = '0'
+
+      for (let graphic in component.graphics) {
+        let graphicItem = component.graphics[graphic]
+        this.backend.object(graphicItem, graphicItem.type)
       }
-
-      // Do we want to convert this value? We may not be using type conversion at all
-      let typeConverter = fieldTypeConverters ? fieldTypeConverters[index] : null
-      if (typeConverter) {
-        value = typeConverter(value)
-      }
-
-      targetObject[fieldName] = value
+    } finally {
+      this.backend.endSchComponentContext()
     }
-
-    return targetObject
   }
 
   _convertPoint (data, xName = 'x', yName = 'y') {

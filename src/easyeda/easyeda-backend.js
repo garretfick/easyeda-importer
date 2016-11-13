@@ -1,5 +1,7 @@
 'use strict'
 
+const EasyEdaFactory = require('./easyeda-factory')
+
 /**
  * Backend to generate the EasyEDA JSON-compatible data structure
  */
@@ -10,6 +12,7 @@ class EasyEdaBackend {
     // to either a schematic or a schlib in the schematic
     this.contexts = []
     this.nextObjectIndex = 1
+    this.factory = new EasyEdaFactory()
   }
 
   /**
@@ -36,41 +39,7 @@ class EasyEdaBackend {
    * This is mostly just boiler place determined by outputting the JSON from EasyEDA
    */
   beginSchematicContext () {
-    let schematic = {
-      BBox: {
-        height: 310,
-        width: 156.4,
-        x: 83.6,
-        y: -10
-      },
-      canvas: {
-        altSnapSize: '5',
-        backGround: '#FFFFFF',
-        canvasHeight: 1000,
-        canvasWidth: 1000,
-        gridColor: '#CCCCCC',
-        gridSize: '10',
-        gridStyle: 'line',
-        gridVisible: 'yes',
-        originX: 0,
-        originY: 0,
-        snapSize: '10',
-        unit: 'pixel',
-        viewHeight: 1000,
-        viewWidth: 1000
-      },
-      head: {
-        c_para: 'Prefix Start 1',
-        c_spiceCmd: null,
-        docType: '1',
-        importFlag: undefined,
-        portOfADImportHack: '',
-        spiceConfigure: '',
-        transformList: ''
-      },
-      itemOrder: []
-    }
-
+    let schematic = this.factory.createSchematic()
     this._pushContext(schematic)
   }
 
@@ -82,43 +51,34 @@ class EasyEdaBackend {
   }
 
   /**
-   * Start a context that can hold a library of schlib objects. Normally this is used
-   * when reading a library before reading the containing schematic
-   */
-  beginSchLibContainerContext () {
-    let schlibContainer = {}
-    this._pushContext(schlibContainer)
-  }
-
-  endSchLibContainerContext () {
-    this._popContext()
-  }
-
-  /**
    * Start a context for an individual schlib object (eg. a library component)
    */
-  beginSchLibContext () {
+  beginSchComponentContext () {
     // A schlib context can never be the root context
     let parentContext = this._getContext()
     if (!parentContext) {
       throw Error('schlib context cannot be the root context. It must have a parent')
     }
 
-    let schlib = {}
+    // The base definition of a component instance
+    let schlib = this.factory.createComponent()
+
     this._pushContext(schlib)
+
+    return schlib
   }
 
-  endSchLibContext () {
-    let schlibContext = this._popContext()
+  /**
+   * End the schematic component context. This will add the component to the owner context.
+   */
+  endSchComponentContext () {
+    let schlibComponent = this._popContext()
 
-    // Add it to the owning parent, now that we know the name
-    // TODO I'm sure this name is wrong, just want the tests to pass
-    if (!schlibContext.hasOwnProperty('name')) {
-      throw Error('Context does not have a name. Cannot add this schlib item')
-    }
+    // This needs to be added to the schlib element
+    let identifier = this._nextIdentifier()
+    schlibComponent.head.gId = identifier
 
-    let parentContext = this._getContext()
-    parentContext[schlibContext['name']] = schlibContext
+    this._addObject(schlibComponent, identifier, 'schlib')
   }
 
   /**
@@ -173,6 +133,14 @@ class EasyEdaBackend {
     return this
   }
 
+  object (object, typeName) {
+    let identifier = this._nextIdentifier()
+
+    this._addObject(object, identifier, typeName)
+
+    return this
+  }
+
   /**
    * Update the context with the properties from the object
    *
@@ -183,7 +151,16 @@ class EasyEdaBackend {
     Object.assign(contextObject, updateObject)
   }
 
-  _addObject (object, identifier, objectType) {
+  /**
+   * Add an object to the context.
+   *
+   * @param {object} item The object to add
+   *
+   * @param {any} identifier
+   *
+   * @param {string} objectType The object type to add, affects which section it is added to
+   */
+  _addObject (item, identifier, objectType) {
     // Make sure the section for this type exists
     let context = this._getContext()
 
@@ -191,10 +168,10 @@ class EasyEdaBackend {
       context[objectType] = {}
     }
 
-        // Add the object
-    context[objectType][identifier] = object
+    // Add the object
+    context[objectType][identifier] = item
 
-        // Then append the objec to the list of ordered objects
+    // Then append the objec to the list of ordered objects
     context.itemOrder.push(identifier)
   }
 

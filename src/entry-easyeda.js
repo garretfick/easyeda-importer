@@ -1,8 +1,8 @@
 'use strict'
 
 const fs = require('fs')
-const EasyEdaBackend = require('./easyeda-backend')
-const KiCadReader = require('./kicad-reader')
+const EasyEdaBackend = require('./easyeda/easyeda-backend')
+const KiCadReader = require('./kicad/kicad-reader')
 
 console.log('here')
 

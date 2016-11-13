@@ -2,7 +2,7 @@
 
 'use strict'
 
-const rd = require('../kicad/kicad-base-reader')
+const rd = require('../src/kicad/kicad-base-reader')
 
 describe('KiCadBaseReader', () => {
   describe('#readFieldsInfoArray()', () => {
