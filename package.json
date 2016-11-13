@@ -6,7 +6,9 @@
     "scripts": {
         "test": "./node_modules/.bin/mocha test/**/*.js",
         "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha  --report lcovonly -- --check-leaks",
-        "dist": "./node_modules/.bin/webpack",
+        "dist": "npm run dist-lib2sch && npm run dist-sch2sch",
+        "dist-lib2sch": "./node_modules/.bin/webpack --config webpack-lib2sch.config.js",
+        "dist-sch2sch": "./node_modules/.bin/webpack --config webpack-sch2sch.config.js",
         "lint": "./node_modules/.bin/standard"
     },
     "keywords": [
@@ -27,6 +29,9 @@
     "standard": {
         "globals": [
             "api"
+        ],
+        "ignore": [
+            "dist/**/*.js"
         ]
     }
 }

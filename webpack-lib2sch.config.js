@@ -5,10 +5,10 @@
 const path = require('path')
 
 module.exports = {
-  entry: './kicad/entry-easyeda',
+  entry: './src/entry-lib2sch',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'bundle-lib2sch.js'
   },
   externals: [
     // For each of the names in the IGNORES list, do not

@@ -65,8 +65,10 @@ class KiCadReader
     // Get the library from the read libraries
     let library = this.schematicLibs[libraryName]
     for (let name in library) {
+      console.log('converting ' + name)
       let component = library[name]
       this._convertLibraryComponent(component)
+      console.log(component)
     }
 
     this.backend.endSchematicContext()
@@ -238,11 +240,12 @@ class KiCadReader
       libComponent.head.x = '0'
       libComponent.head.y = '0'
 
-      for (let graphic in component.graphics) {
-        let graphicItem = component.graphics[graphic]
+      for (let index = 0; index < component.graphics.length; ++index) {
+        let graphicItem = component.graphics[index]
         this.backend.addDrawingObject(graphicItem, graphicItem.type)
       }
     } finally {
+      console.log('end sch component context')
       this.backend.endSchComponentContext()
     }
   }

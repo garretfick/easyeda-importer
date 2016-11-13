@@ -53,8 +53,6 @@ class DrawingObject
         }
       } else if (typeof (value) === 'object') {
         this._objectToPrimitives(value)
-      } else if (typeof (value) === 'DrawingObject') {
-
       }
     }
   }

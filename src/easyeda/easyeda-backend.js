@@ -78,6 +78,8 @@ class EasyEdaBackend {
     let identifier = this._nextIdentifier()
     schlibComponent.head.gId = identifier
 
+    console.log(schlibComponent)
+
     this._addObject(schlibComponent, identifier, 'schlib')
   }
 
@@ -143,6 +145,8 @@ class EasyEdaBackend {
 
     // Get the primitives only represetation of the object
     let objectType = drawingObject.__type
+    console.log(objectType)
+    console.log(drawingObject)
     let primitives = drawingObject.toPrimitives()
 
     this._addObject(primitives, identifier, objectType)
