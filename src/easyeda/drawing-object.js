@@ -55,6 +55,8 @@ class DrawingObject
         this._objectToPrimitives(value)
       }
     }
+
+    return data
   }
 }
 

@@ -23,6 +23,11 @@ class Ellipse extends SimpleShape
     this.strokeWidth = '1'
   }
 
+  /**
+   * Set the radius of the ellipse. This sets the x and y radius to be
+   * equal (essentially making this a circle)
+   * @param {number} value The new radius
+   */
   set radius (value) {
     this.rx = value.toString()
     this.ry = value.toString()

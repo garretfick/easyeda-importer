@@ -70,31 +70,31 @@ describe('KiCadLibReader', () => {
       shape.fillColor.should.equal('#000000')
 
       shape.pointArr.should.eql([
-        {x: -50, y: 50},
-        {x: 50, y: 0},
-        {x: -50, y: -50}])
+        {x: -5, y: 5},
+        {x: 5, y: 0},
+        {x: -5, y: -5}])
     })
 
     it('_readGraphic() rectangle', () => {
       let shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
 
       shape.x.should.equal('0')
-      shape.y.should.equal('50')
-      shape.width.should.equal('900')
-      shape.height.should.equal('850')
+      shape.y.should.equal('5')
+      shape.width.should.equal('90')
+      shape.height.should.equal('85')
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.strokeWidth.should.equal('0')
-      shape.fillColor.should.equal('#000000')
+      shape.fillColor.should.equal('none')
     })
 
     it('_readGraphic() circle', () => {
       let shape = reader._readGraphic('C 0 50 70 0 1 0 F')
 
       shape.cx.should.equal('0')
-      shape.cy.should.equal('50')
-      shape.rx.should.equal('70')
-      shape.ry.should.equal('70')
+      shape.cy.should.equal('5')
+      shape.rx.should.equal('7')
+      shape.ry.should.equal('7')
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.strokeWidth.should.equal('0')
@@ -142,7 +142,7 @@ describe('KiCadLibReader', () => {
 
       // TODO this orientation is not handled correctly
       shape.orientation.should.equal('0')
-      shape.x.should.equal('-320')
+      shape.x.should.equal('-32')
       shape.y.should.equal('-10')
       shape.dimension.should.equal(100)
       shape.__kicad_unit.should.equal('0')
@@ -156,9 +156,9 @@ describe('KiCadLibReader', () => {
       // TODO this orientation is not handled correctly
       shape.name.should.equal('TO')
       shape.number.should.equal('1')
-      shape.x.should.equal(200)
+      shape.x.should.equal(20)
       shape.y.should.equal(0)
-      shape.length.should.equal(150)
+      shape.length.should.equal(15)
       shape.orientation.should.equal('R')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
@@ -173,9 +173,9 @@ describe('KiCadLibReader', () => {
       // TODO this orientation is not handled correctly
       shape.name.should.equal('K')
       shape.number.should.equal('2')
-      shape.x.should.equal(200)
+      shape.x.should.equal(20)
       shape.y.should.equal(0)
-      shape.length.should.equal(150)
+      shape.length.should.equal(15)
       shape.orientation.should.equal('L')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
@@ -209,8 +209,8 @@ describe('KiCadLibReader', () => {
       shape.name.should.equal('~')
       shape.number.should.equal('2')
       shape.x.should.equal(0)
-      shape.y.should.equal(250)
-      shape.length.should.equal(200)
+      shape.y.should.equal(25)
+      shape.length.should.equal(20)
       shape.orientation.should.equal('U')
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)

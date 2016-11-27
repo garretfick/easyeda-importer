@@ -28,6 +28,8 @@ reader.libraryToSchematic('OPAMP')
 // Now we have a scheamtic, so get the data
 const schematicData = backend.getSchematic()
 
+console.log(schematicData)
+
 // Add finally call the EasyEDA function to create a new schematic
 // with the data
 api('applySource', {source: schematicData, createNew: true})

@@ -15,6 +15,9 @@ describe('Pin', () => {
 
       primitivesData.name.text.should.equal('pinName')
       primitivesData.num.text.should.equal('2')
+
+      // Validate that the path data is correctly output
+      primitivesData.clock.pathString.should.equal('M10 -3L7 0L10 3')
     })
   })
 })

@@ -18,17 +18,17 @@ describe('KiCadReader', () => {
   })
 
   describe('#text()', () => {
-    it('text() parses label', () => {
-      reader._readSchText([
-        'Text Label 5450 4050 0 50 ~ 0',
-        'SCK'
-      ], 0)
+    // it('text() parses label', () => {
+    //  reader._readSchText([
+    //    'Text Label 5450 4050 0 50 ~ 0',
+    //    'SCK'
+    //  ], 0)
 
-      let schematicData = backend.getSchematic()
-      schematicData.should.have.property('annotation').with.property('gg1')
+    //  let schematicData = backend.getSchematic()
+    //  schematicData.should.have.property('annotation').with.property('gg1')
 
-      let annotation = schematicData.annotation.gg1
-      annotation.string.should.equal('SCK')
-    })
+    //  let annotation = schematicData.annotation.gg1
+    //  annotation.string.should.equal('SCK')
+    // })
   })
 })

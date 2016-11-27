@@ -65,10 +65,8 @@ class KiCadReader
     // Get the library from the read libraries
     let library = this.schematicLibs[libraryName]
     for (let name in library) {
-      console.log('converting ' + name)
       let component = library[name]
       this._convertLibraryComponent(component)
-      console.log(component)
     }
 
     this.backend.endSchematicContext()
@@ -161,9 +159,6 @@ class KiCadReader
     this._convertPoint(textData)
 
     let textValue = schematicData[index]
-    // TODO maybe using Object.assign
-    // (or my own variant) will make this code easier to maintain
-    // with fewer function parameters
     this.backend.text(textValue, textData.x, textData.y)
 
     return index
@@ -189,7 +184,6 @@ class KiCadReader
       [null, parseInt, parseInt])
 
     while (!schematicData[index].startsWith('$EndComp') && index < schematicData.length) {
-      console.log(schematicData[index])
       index += 1
     }
 
@@ -245,7 +239,6 @@ class KiCadReader
         this.backend.addDrawingObject(graphicItem, graphicItem.type)
       }
     } finally {
-      console.log('end sch component context')
       this.backend.endSchComponentContext()
     }
   }

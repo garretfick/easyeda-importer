@@ -16,6 +16,7 @@ class KiCadLibReader {
   constructor (factory) {
     this.library = {}
     this.factory = factory
+    this.scaleFactor = 10
   }
 
   /**
@@ -201,8 +202,8 @@ class KiCadLibReader {
         let points = []
         for (let valIndex = 5; valIndex < lastValIndex; valIndex += 2) {
           points.push({
-            x: parseInt(fields[valIndex]),
-            y: parseInt(fields[valIndex + 1])
+            x: parseInt(fields[valIndex]) / KiCadLibReader.SCALE_FACTOR,
+            y: parseInt(fields[valIndex + 1]) / KiCadLibReader.SCALE_FACTOR
           })
         }
 
@@ -223,8 +224,8 @@ class KiCadLibReader {
           [null, '__kicad_startx', '__kicad_starty', '__kicad_endx',
           '__kicad_endy', '__kicad_unit', '__kicad_convert', 'strokeWidth',
           'fillColor'],
-          [null, parseInt, parseInt, parseInt,
-          parseInt, null, null, KiCadLibReader._parseWidth,
+          [null, KiCadLibReader._parseLength, KiCadLibReader._parseLength, KiCadLibReader._parseLength,
+          KiCadLibReader._parseLength, null, null, KiCadLibReader._parseWidth,
           KiCadLibReader._parseFillStyle])
 
         // TODO knowing that this needs to be a string makes me unhappy here
@@ -248,6 +249,8 @@ class KiCadLibReader {
         // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
 
         shape = this.factory.createArc()
+
+        // TODO this is all wrong
 
         rd.readFieldsInto(shape, value,
           [null, 'x', 'y', 'radius',
@@ -280,8 +283,8 @@ class KiCadLibReader {
           [null, 'name', 'number', 'x', 'y',
           'length', 'orientation', 'numberDimension', 'nameDimension',
           '__kicad_unit', '__kicad_convert', 'electricalType', 'shape'],
-          [null, null, null, parseInt, parseInt,
-          parseInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
+          [null, null, null, KiCadLibReader._parseLengthInt, KiCadLibReader._parseLengthInt,
+          KiCadLibReader._parseLengthInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
           null, null, null, null])
 
         shape = pin
@@ -334,16 +337,21 @@ class KiCadLibReader {
    * @private
    */
   static _parseFillStyle (value) {
-    return rd.parseOptions(value, { F: '#000000', f: '#000000', N: 'none' })
+    // This seems wrong, but as far as I can tell, lowercase f means non-filled
+    return rd.parseOptions(value, { F: '#000000', f: 'none', N: 'none' })
   }
 
   static _parseWidth (value) {
     // TODO convert width values
-    return parseInt(value).toString()
+    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR).toString()
   }
 
   static _parseLength (value) {
-    return parseInt(value).toString()
+    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR).toString()
+  }
+
+  static _parseLengthInt (value) {
+    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR)
   }
 
   /**
@@ -366,6 +374,9 @@ class KiCadLibReader {
     data[xName] = data[xName]
     data[yName] = data[yName]
   }
-};
+}
+
+KiCadLibReader.SCALE_FACTOR = 10
+
 
 module.exports = KiCadLibReader

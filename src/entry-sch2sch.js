@@ -4,8 +4,6 @@ const fs = require('fs')
 const EasyEdaBackend = require('./easyeda/easyeda-backend')
 const KiCadReader = require('./kicad/kicad-reader')
 
-console.log('here')
-
 // Create the backend to generate EasyEDA schematic
 let backend = new EasyEdaBackend()
 backend.initializeSchematic()
@@ -21,4 +19,5 @@ backend.rect()
 let schematicData = backend.getSchematic()
 
 console.log(schematicData)
+
 api('applySource', {source: schematicData, createNew: true})

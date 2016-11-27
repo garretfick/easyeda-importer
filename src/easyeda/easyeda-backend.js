@@ -78,61 +78,7 @@ class EasyEdaBackend {
     let identifier = this._nextIdentifier()
     schlibComponent.head.gId = identifier
 
-    console.log(schlibComponent)
-
     this._addObject(schlibComponent, identifier, 'schlib')
-  }
-
-  /**
-   * Add a rectangle to the current context
-   *
-   *
-   */
-  rect () {
-    let identifier = this._nextIdentifier()
-    let objectData = {
-      fillColor: 'none',
-      gId: identifier,
-      height: 50,
-      rx: '',
-      ry: '',
-      strokeColor: '#000000',
-      strokeStyle: 0,
-      strokeWidth: '1',
-      width: '60',
-      x: '180',
-      y: '240'
-    }
-
-    this._addObject(objectData, identifier, 'rect')
-
-    return this
-  }
-
-  text (value, xPos, yPos) {
-    let identifier = this._nextIdentifier()
-
-    let objectData = {
-      dominantBaseline: 'none',
-      fillColor: '',
-      fontFamily: '',
-      fontSize: '9pt',
-      fontStyle: '',
-      fontWeight: '',
-      gId: identifier,
-      mark: 'L',
-      rotation: 0,
-      string: value,
-      textAnchor: 'start',
-      type: 'comment',
-      visible: 1,
-      x: xPos,
-      y: yPos
-    }
-
-    this._addObject(objectData, identifier, 'annotation')
-
-    return this
   }
 
   /**
@@ -145,8 +91,6 @@ class EasyEdaBackend {
 
     // Get the primitives only represetation of the object
     let objectType = drawingObject.__type
-    console.log(objectType)
-    console.log(drawingObject)
     let primitives = drawingObject.toPrimitives()
 
     this._addObject(primitives, identifier, objectType)
