@@ -355,6 +355,36 @@ class KiCadLibReader {
   }
 
   /**
+   * Parsing the pin orientiation means reading in the data, and then applying the appropriate
+   * transform for the pin object. We do this by returning the appropriate rotation
+   * and then the name of the property we are setting knows to rotate about the origin of the pin.
+   */
+  static _parsePinOrientation (value) {
+    // The values here are U, D, R, L, which we translate into
+    // rotations
+    let rotation = 0
+
+    switch (value) {
+      case 'U':
+        rotation = 90
+        break
+      case 'D':
+        rotation = 270
+        break
+      case 'R':
+        rotation = 0
+        break
+      case 'L':
+        rotation = 180
+        break
+      default:
+        throw new Error('Cannot convert pin with unexpected orientiation ' + value)
+    }
+
+    return rotation
+  }
+
+  /**
    * Check that the unit and convert values are supported by EasyEDA, or throw an Error
    * @param {object} shape The shape object to check
    */

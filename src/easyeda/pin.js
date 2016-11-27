@@ -1,6 +1,7 @@
 'use strict'
 
 const DrawingObject = require('./drawing-object')
+const Point = require('../util/point')
 const SVGPathData = require('svg-pathdata')
 
 /**
@@ -20,8 +21,9 @@ class Pin extends DrawingObject
     // Our current anchor position (where it connects to the body of the symbol)
     // This is not the point where you connect a wire. Keep track of this
     // as we manipulte the pin so we know where we are at all times
-    this.anchorX = 0
-    this.anchorY = 0
+    this.anchor = new Point(0, 0)
+    // Our default pin length is 10 units
+    this.connectionPoint = new Point(10, 0)
 
     this.data = {
       clock: {
@@ -34,13 +36,11 @@ class Pin extends DrawingObject
         // gId: '',
         rotation: '0',
         spicePin: '1',
-        x: 13,
-        y: 0
+        point: new Point(13, 0)
       },
       dot: {
         visible: 0,
-        x: 13,
-        y: 0
+        point: new Point(13, 0)
       },
       name: {
         fontFamily: '',
@@ -49,8 +49,7 @@ class Pin extends DrawingObject
         text: '',
         textAnchor: 'start',
         visible: 1,
-        x: -4,
-        y: 0
+        point: new Point(-4, 0)
       },
       num: {
         fontFamily: '',
@@ -59,16 +58,13 @@ class Pin extends DrawingObject
         text: '',
         textAnchor: 'end',
         visible: 0,
-        x: 4,
-        y: -5
+        point: new Point(4, -5)
       },
       path: {
-        pathString: new SVGPathData('M 0 0 h 10'),
         pinColor: '#000000'
       },
       pinDot: {
-        x: 10,
-        y: 0
+        point: new Point(10, 0)
       }
     }
   }
@@ -81,14 +77,24 @@ class Pin extends DrawingObject
 
     // Now convert the members that need to be converted. First handle xy values
     // converting to strings
-    Pin.convertXyProps.forEach(propOwner => {
-      primitives[propOwner].x = primitives[propOwner].x.toString()
-      primitives[propOwner].y = primitives[propOwner].y.toString()
+    Pin.stringPoints.forEach(propOwner => {
+      primitives[propOwner].x = primitives[propOwner].point.x.toString()
+      primitives[propOwner].y = primitives[propOwner].point.y.toString()
+      delete primitives[propOwner].point
+    })
+
+    Pin.numberPoints.forEach(propOwner => {
+      primitives[propOwner].x = primitives[propOwner].point.x
+      primitives[propOwner].y = primitives[propOwner].point.y
+      delete primitives[propOwner].point
     })
 
     Pin.pathProps.forEach(propOwner => {
       primitives[propOwner].pathString = primitives[propOwner].pathString.encode()
     })
+
+    // Create the pathString item for the path property
+    primitives.path.pathString = ['M', this.anchor.x, this.anchor.y, this.connectionPoint.x, this.connectionPoint.y].join(' ')
 
     return primitives
   }
@@ -99,6 +105,7 @@ class Pin extends DrawingObject
    */
   set name (name) {
     this.data.name.text = name
+    return this
   }
 
   get name () {
@@ -111,6 +118,7 @@ class Pin extends DrawingObject
    */
   set number (number) {
     this.data.num.text = number
+    return this
   }
 
   get number () {
@@ -118,27 +126,36 @@ class Pin extends DrawingObject
   }
 
   /**
-   * Set the x position of the pin.
+   * Offset the pin to the new X position
+   * @param {number} number The new X position
    */
   set x (number) {
-    let offsetX = number - this.anchorX
+    let offsetX = number - this.anchor.x
     this.translate(offsetX, 0)
-  }
 
-  get x () {
-    return this.anchorX
+    return this
   }
 
   /**
-   * Set the y position of the pin.
+   * Get the current X postition of the pin
+   */
+  get x () {
+    return this.anchor.x
+  }
+
+  /**
+   * Offset the pin ot the new Y position
+   * @param {number} number The new Y position
    */
   set y (number) {
-    let offsetY = number - this.anchorY
+    let offsetY = number - this.anchor.y
     this.translate(0, offsetY)
+
+    return this
   }
 
   get y () {
-    return this.anchorY
+    return this.anchor.y
   }
 
   /**
@@ -154,22 +171,45 @@ class Pin extends DrawingObject
 
     // Move the nested members
     Pin.xyProps.forEach(propName => {
-      this.data[propName].x += dx
-      this.data[propName].y += dy
+      this.data[propName].point.translate(dx, dy)
     })
 
     Pin.pathProps.forEach(propName => {
       this.data[propName].pathString = this.data[propName].pathString.translate(dx, dy)
     })
 
-    // Move our anchor point to the new locations
-    this.anchorX += dx
-    this.anchorY += dy
+    // Move our anchor and connection points to the new locations
+    this.anchor.translate(dx, dy)
+    this.connectionPoint.translate(dx, dy)
+
+    return this
+  }
+
+  /**
+   * Set the orientation of the point. This is an implied rotation about the current center point.
+   */
+  set orientation (angleDegrees) {
+    if (angleDegrees === 0) {
+      return this
+    }
+
+    Pin.xyProps.forEach(propName => {
+      this.data[propName].point.rotateDegrees(angleDegrees, this.anchor)
+    })
+
+    Pin.pathProps.forEach(propName => {
+      // this.data[propName].pathString = this.data[propName].pathString.translate(dx, dy)
+    })
+
+    this.connectionPoint.rotateDegrees(angleDegrees, this.anchor)
+
+    return this
   }
 }
 
 Pin.xyProps = ['configure', 'dot', 'name', 'num', 'pinDot']
-Pin.convertXyProps = ['configure', 'dot', 'name', 'num']
-Pin.pathProps = ['clock', 'path']
+Pin.stringPoints = ['configure', 'dot', 'name', 'num']
+Pin.numberPoints = ['pinDot']
+Pin.pathProps = ['clock']
 
 module.exports = Pin

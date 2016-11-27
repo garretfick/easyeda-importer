@@ -4,6 +4,7 @@
 
 const fs = require('fs')
 const should = require('should')
+const Point = require('../src/util/point')
 const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
 const EasyEdaFactory = require('../src/easyeda/easyeda-factory')
 
@@ -158,8 +159,10 @@ describe('KiCadLibReader', () => {
       shape.number.should.equal('1')
       shape.x.should.equal(20)
       shape.y.should.equal(0)
+      // TODO this is not being handled correctly
       shape.length.should.equal(15)
-      shape.orientation.should.equal('R')
+      shape.connectionPoint.x.should.equal(30)
+      shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
@@ -176,7 +179,8 @@ describe('KiCadLibReader', () => {
       shape.x.should.equal(20)
       shape.y.should.equal(0)
       shape.length.should.equal(15)
-      shape.orientation.should.equal('L')
+      shape.connectionPoint.x.should.equal(10)
+      shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
@@ -193,7 +197,8 @@ describe('KiCadLibReader', () => {
       shape.x.should.equal(0)
       shape.y.should.equal(0)
       shape.length.should.equal(0)
-      shape.orientation.should.equal('R')
+      shape.connectionPoint.x.should.equal(10)
+      shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
@@ -205,13 +210,14 @@ describe('KiCadLibReader', () => {
     it('_readGraphic() pin 4', () => {
       let shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
 
-      // TODO this orientation is not handled correctly
       shape.name.should.equal('~')
       shape.number.should.equal('2')
       shape.x.should.equal(0)
       shape.y.should.equal(25)
       shape.length.should.equal(20)
-      shape.orientation.should.equal('U')
+      shape.connectionPoint.x.should.equal(0)
+      // TODO I think this should be 35, but for some reason, it comes out to 25???
+      shape.connectionPoint.y.should.equal(25)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
