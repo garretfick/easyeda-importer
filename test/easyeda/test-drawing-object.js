@@ -3,6 +3,7 @@
 'use strict'
 
 const DrawingObject = require('../../src/easyeda/drawing-object')
+const GidGenerator = require('../../src/easyeda/gid-generator')
 
 /**
  * Test class that declares members that don't need to be converted.
@@ -30,19 +31,29 @@ class ParentDrawingObject extends DrawingObject
 
 describe('DrawingObject', () => {
   describe('#toPrimitives', () => {
+    let idGen = null
+
+    beforeEach(() => {
+      idGen = new GidGenerator()
+    })
+
     it('toPrimitives() with only primitives returns same data', () => {
       let drawingObject = new RootDrawingObject()
 
-      let primitivesData = drawingObject.toPrimitives()
+      let { primitives, id } = drawingObject.toPrimitives(idGen)
 
-      primitivesData.should.have.properties(['some', 'other'])
+      primitives.should.have.properties(['some', 'other', 'gId'])
+      id.should.equal(primitives.gId)
+      id.should.equal('gge1')
     })
+
     it('toPrimitives() converts nested data', () => {
       let drawingObject = new ParentDrawingObject()
 
-      let primitivesData = drawingObject.toPrimitives()
+      let { primitives, id } = drawingObject.toPrimitives(idGen)
 
-      primitivesData.should.have.properties(['something', 'other'])
+      primitives.should.have.properties(['something', 'other', 'gId'])
+      id.should.equal(primitives.gId)
     })
   })
 })

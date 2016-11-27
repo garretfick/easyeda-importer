@@ -71,8 +71,9 @@ class Pin extends DrawingObject
 
   /**
    * Override converting to primtive data since we store this in a nested member.
+   * @param {GidGenerator} idGenerator Class to generate new IDs when converting to primitives
    */
-  toPrimitives () {
+  toPrimitives (idGenerator) {
     let primitives = Object.assign({}, this.data)
 
     // Now convert the members that need to be converted. First handle xy values
@@ -96,7 +97,9 @@ class Pin extends DrawingObject
     // Create the pathString item for the path property
     primitives.path.pathString = ['M', this.anchor.x, this.anchor.y, this.connectionPoint.x, this.connectionPoint.y].join(' ')
 
-    return primitives
+    primitives.configure.gId = idGenerator.nextGid()
+
+    return { primitives: primitives, id: primitives.configure.gId }
   }
 
   /**

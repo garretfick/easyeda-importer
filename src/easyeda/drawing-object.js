@@ -24,10 +24,12 @@ class DrawingObject
    *
    * If you need to keep the object around, then you must clone it first.
    *
+   * @param {GidGenerator} idGenerator Generates unique IDs for nested objects
+   *
    * @return {object} Returns the object converted to only contain only the primitives
    * understood by EasyEDA.
    */
-  toPrimitives () {
+  toPrimitives (idGenerator) {
     let data = this._primitiveData()
 
     // Do a search for any members in the data that need conversion. This is a basic recursive
@@ -35,7 +37,10 @@ class DrawingObject
     // data by calling it's toPrimitives function
     this._objectToPrimitives(data)
 
-    return data
+    // Assign this object an identifier since we are creating an instance
+    data.gId = idGenerator.nextGid()
+
+    return { primitives: data, id: data.gId }
   }
 
   _objectToPrimitives (data) {

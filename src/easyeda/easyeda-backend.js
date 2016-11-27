@@ -1,6 +1,7 @@
 'use strict'
 
 const EasyEdaFactory = require('./easyeda-factory')
+const GidGenerator = require('./gid-generator')
 
 /**
  * Backend to generate the EasyEDA JSON-compatible data structure
@@ -11,7 +12,7 @@ class EasyEdaBackend {
     // Maintain a stack of the current context. Normally this is either 1 or 2 items, corresponding
     // to either a schematic or a schlib in the schematic
     this.contexts = []
-    this.nextObjectIndex = 1
+    this.idGenerator = new GidGenerator()
     this.factory = new EasyEdaFactory()
   }
 
@@ -74,11 +75,9 @@ class EasyEdaBackend {
   endSchComponentContext () {
     let schlibComponent = this._popContext()
 
-    // This needs to be added to the schlib element
-    let identifier = this._nextIdentifier()
-    schlibComponent.head.gId = identifier
+    let { primitives, id } = schlibComponent.toPrimitives(this.idGenerator)
 
-    this._addObject(schlibComponent, identifier, 'schlib')
+    this._addObject(primitives, id, 'schlib')
   }
 
   /**
@@ -87,13 +86,11 @@ class EasyEdaBackend {
    * @param {DrawingObject} drawingObject The object to add
    */
   addDrawingObject (drawingObject) {
-    let identifier = this._nextIdentifier()
-
     // Get the primitives only represetation of the object
     let objectType = drawingObject.__type
-    let primitives = drawingObject.toPrimitives()
+    let { primitives, id } = drawingObject.toPrimitives(this.idGenerator)
 
-    this._addObject(primitives, identifier, objectType)
+    this._addObject(primitives, id, objectType)
 
     return this
   }
@@ -130,12 +127,6 @@ class EasyEdaBackend {
 
     // Then append the objec to the list of ordered objects
     context.itemOrder.push(identifier)
-  }
-
-  _nextIdentifier () {
-    // Create the identifier, then increment to the next index
-    let identifier = 'gg' + this.nextObjectIndex++
-    return identifier
   }
 
   getSchematic () {
