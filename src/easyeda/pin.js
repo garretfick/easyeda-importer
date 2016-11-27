@@ -186,6 +186,30 @@ class Pin extends DrawingObject
   }
 
   /**
+   * Set the length of the pin.
+   */
+  set length (length) {
+    // TODO currently, this works for KiCAD because we get the pin length before rotating
+    // TODO if the order changes, then this is no valid
+    if (this.connectionPoint.y !== this.anchor.y) {
+      throw new Error('You must set the length before rotating the pin, or fix this function')
+    }
+
+    // Since we are not allowing you to rotate first, setting the length is the same as setting
+    // the location
+    this.connectionPoint.x = this.anchor.x + length
+  }
+
+  /**
+   * Get the length of the pin
+   *
+   * @return {number} The length of the pin
+   */
+  get length () {
+    return this.anchor.distance(this.connectionPoint)
+  }
+
+  /**
    * Set the orientation of the point. This is an implied rotation about the current center point.
    */
   set orientation (angleDegrees) {
@@ -197,6 +221,9 @@ class Pin extends DrawingObject
       this.data[propName].point.rotateDegrees(angleDegrees, this.anchor)
     })
 
+    // TODO this is not rotating because the implementation doessn't seem to allow
+    // TODO rotation about arbitrary point. We need to translate, rotate, then translate
+    // TODO back.
     Pin.pathProps.forEach(propName => {
       // this.data[propName].pathString = this.data[propName].pathString.translate(dx, dy)
     })

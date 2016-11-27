@@ -151,17 +151,15 @@ describe('KiCadLibReader', () => {
       shape.value.should.equal('VREF')
     })
 
-    it('_readGraphic() pin 1', () => {
+    it('_readGraphic() pin 1 (right orientation)', () => {
       let shape = reader._readGraphic('X TO 1 200 0 150 R 40 40 1 1 P')
 
-      // TODO this orientation is not handled correctly
       shape.name.should.equal('TO')
       shape.number.should.equal('1')
       shape.x.should.equal(20)
       shape.y.should.equal(0)
-      // TODO this is not being handled correctly
       shape.length.should.equal(15)
-      shape.connectionPoint.x.should.equal(30)
+      shape.connectionPoint.x.should.equal(35)
       shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
@@ -170,16 +168,15 @@ describe('KiCadLibReader', () => {
       shape.electricalType.should.equal('P')
     })
 
-    it('_readGraphic() pin 2', () => {
+    it('_readGraphic() pin 2 (left orientation)', () => {
       let shape = reader._readGraphic('X K 2 200 0 150 L 40 40 1 1 P')
 
-      // TODO this orientation is not handled correctly
       shape.name.should.equal('K')
       shape.number.should.equal('2')
       shape.x.should.equal(20)
       shape.y.should.equal(0)
       shape.length.should.equal(15)
-      shape.connectionPoint.x.should.equal(10)
+      shape.connectionPoint.x.should.equal(5)
       shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
@@ -188,16 +185,15 @@ describe('KiCadLibReader', () => {
       shape.electricalType.should.equal('P')
     })
 
-    it('_readGraphic() pin 3', () => {
+    it('_readGraphic() pin 3 (right orientation, 0 length)', () => {
       let shape = reader._readGraphic('X 0 1 0 0 0 R 40 40 1 1 W NC')
 
-      // TODO this orientation is not handled correctly
       shape.name.should.equal('0')
       shape.number.should.equal('1')
       shape.x.should.equal(0)
       shape.y.should.equal(0)
       shape.length.should.equal(0)
-      shape.connectionPoint.x.should.equal(10)
+      shape.connectionPoint.x.should.equal(0)
       shape.connectionPoint.y.should.equal(0)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
@@ -207,7 +203,7 @@ describe('KiCadLibReader', () => {
       shape.shape.should.equal('NC')
     })
 
-    it('_readGraphic() pin 4', () => {
+    it('_readGraphic() pin 4 (up direction)', () => {
       let shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
 
       shape.name.should.equal('~')
@@ -216,8 +212,7 @@ describe('KiCadLibReader', () => {
       shape.y.should.equal(25)
       shape.length.should.equal(20)
       shape.connectionPoint.x.should.equal(0)
-      // TODO I think this should be 35, but for some reason, it comes out to 25???
-      shape.connectionPoint.y.should.equal(25)
+      shape.connectionPoint.y.should.equal(45)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')

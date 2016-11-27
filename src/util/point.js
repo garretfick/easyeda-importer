@@ -29,10 +29,23 @@ class Point {
     let cosAngle = Math.cos(angleRad)
     let sinAngle = Math.sin(angleRad)
 
-    this.x = Math.round(cosAngle * (this.x - center.x) - sinAngle * (this.y - center.y) + center.x)
-    this.y = Math.round(sinAngle * (this.x - center.x) + cosAngle * (this.y - center.y) + center.y)
+    let dx = this.x - center.x
+    let dy = this.y - center.y
+
+    this.x = Math.round(cosAngle * dx - sinAngle * dy + center.x)
+    this.y = Math.round(sinAngle * dx + cosAngle * dy + center.y)
 
     return this
+  }
+
+  /**
+   * Calculate the distance between the two points
+   * @return {number} The distance between the two points
+   */
+  distance (other) {
+    let dx = (this.x - other.x)
+    let dy = (this.y - other.y)
+    return Math.round(Math.sqrt(dx * dx + dy * dy))
   }
 }
 
