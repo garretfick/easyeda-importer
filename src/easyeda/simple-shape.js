@@ -13,11 +13,22 @@ class SimpleShape extends DrawingObject
     this.fillColor = 'none'
     this.strokeColor = '#000000'
     this.strokeStyle = 0
-    this.strokeWidth = '1'
+    this.strokeWidth = 0
   }
 
   isFilled (filled) {
     this.fillColor = filled ? '#000000' : 'none'
+  }
+
+  /**
+   * Get the names of attributes that need to be converted to strings
+   * for EasyEDA format.
+   *
+   * @return {[string]} The names of the properties that need to be converted
+   * to a string.
+   */
+  _getStringProps () {
+    return ['strokeWidth']
   }
 }
 

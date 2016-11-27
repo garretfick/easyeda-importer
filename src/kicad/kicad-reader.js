@@ -58,16 +58,22 @@ class KiCadReader
    * reader.addLibrarySource(stream, 'OPAMPS')
    * reader.libraryToSchematic('OPAMPS')
    * reader.getSchematic()
+   *
+   * @param {function} function If defined, a function to decide if the component should be converted
+   * Arguments are an object with the shape { libName: <string>, compName: <string> }
    */
-  libraryToSchematic (libraryName) {
+  libraryToSchematic (filter) {
     this.backend.beginSchematicContext()
 
     // Get the library from the read libraries
-    let library = this.schematicLibs[libraryName]
-    for (let name in library) {
-      let component = library[name]
-      this._convertLibraryComponent(component)
-    }
+    Object.keys(this.schematicLibs).forEach(libName => {
+      let library = this.schematicLibs[libName]
+      Object.keys(library).forEach(compName => {
+        if (!filter || filter({libName, compName})) {
+          this._convertLibraryComponent(library[compName])
+        }
+      })
+    })
 
     this.backend.endSchematicContext()
   }

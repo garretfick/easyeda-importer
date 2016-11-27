@@ -14,19 +14,31 @@ class Rect extends SimpleShape
     this.__type = 'rect'
 
     this.height = 50
-    this.rx = ''
-    this.ry = ''
-    this.width = '60'
-    this.x = '180'
-    this.y = '240'
+    this.rx = 0
+    this.ry = 0
+    this.width = 60
+    this.x = 0
+    this.y = 0
   }
 
   set left (value) {
-    this.x = value.toString()
+    this.x = value
   }
 
   set bottom (value) {
-    this.y = value.toString()
+    this.y = value
+  }
+
+  translate (dx, dy) {
+    this.x += dx
+    this.y += dy
+  }
+
+  /**
+   * @see SimpleShape._getStringProps()
+   */
+  _getStringProps () {
+    return super._getStringProps().concat(['x', 'y', 'rx', 'ry', 'width', 'height'])
   }
 }
 

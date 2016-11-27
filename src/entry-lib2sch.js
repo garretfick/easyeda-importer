@@ -19,11 +19,11 @@ let reader = new KiCadReader()
 reader.backend = backend
 
 // Read the library that we want to convert and add it to the reader
-const libContents = fs.readFileSync('D:/Dev/easyeda-importer/test/kicad/opamp/opamp.lib', 'utf8')
+const libContents = fs.readFileSync('D:/Dev/easyeda-importer/test/kicad/shapes/shapes.lib', 'utf8')
 reader.addLibrarySource(libContents, 'OPAMP')
 
 // Convert a library into a schematic
-reader.libraryToSchematic('OPAMP')
+reader.libraryToSchematic()
 
 // Now we have a scheamtic, so get the data
 const schematicData = backend.getSchematic()

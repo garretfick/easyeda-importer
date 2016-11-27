@@ -202,8 +202,8 @@ class KiCadLibReader {
         let points = []
         for (let valIndex = 5; valIndex < lastValIndex; valIndex += 2) {
           points.push({
-            x: parseInt(fields[valIndex]) / KiCadLibReader.SCALE_FACTOR,
-            y: parseInt(fields[valIndex + 1]) / KiCadLibReader.SCALE_FACTOR
+            x: KiCadLibReader._parseXPos(fields[valIndex]),
+            y: KiCadLibReader._parseYPos(fields[valIndex + 1])
           })
         }
 
@@ -224,15 +224,15 @@ class KiCadLibReader {
           [null, '__kicad_startx', '__kicad_starty', '__kicad_endx',
           '__kicad_endy', '__kicad_unit', '__kicad_convert', 'strokeWidth',
           'fillColor'],
-          [null, KiCadLibReader._parseLength, KiCadLibReader._parseLength, KiCadLibReader._parseLength,
-          KiCadLibReader._parseLength, null, null, KiCadLibReader._parseWidth,
+          [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseXPos,
+          KiCadLibReader._parseYPos, null, null, KiCadLibReader._parseWidth,
           KiCadLibReader._parseFillStyle])
 
         // TODO knowing that this needs to be a string makes me unhappy here
-        shape.left = Math.min(shape.__kicad_startx, shape.__kicad_endx)
-        shape.width = Math.abs(shape.__kicad_startx - shape.__kicad_endx).toString()
-        shape.bottom = Math.min(shape.__kicad_starty, shape.__kicad_endy)
-        shape.height = Math.abs(shape.__kicad_starty - shape.__kicad_endy).toString()
+        shape.x = Math.min(shape.__kicad_startx, shape.__kicad_endx)
+        shape.width = Math.abs(shape.__kicad_startx - shape.__kicad_endx)
+        shape.y = Math.min(shape.__kicad_starty, shape.__kicad_endy)
+        shape.height = Math.abs(shape.__kicad_starty - shape.__kicad_endy)
         break
       case 'C':
         // C posx posy radius unit convert thickness cc
@@ -242,7 +242,7 @@ class KiCadLibReader {
         rd.readFieldsInto(shape, value,
           [null, 'cx', 'cy', 'radius',
           '__kicad_unit', '__kicad_convert', 'strokeWidth', 'fillColor'],
-          [null, KiCadLibReader._parseLength, KiCadLibReader._parseLength, KiCadLibReader._parseLength,
+          [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseLength,
           null, null, KiCadLibReader._parseWidth, KiCadLibReader._parseFillStyle])
         break
       case 'A':
@@ -257,10 +257,10 @@ class KiCadLibReader {
           'startAngle', 'endAngle', '__kicad_unit', '__kicad_convert',
           'thickness', 'filled', 'startPointX', 'startPointY',
           'endPointX', 'endPointY'],
-          [null, parseInt, parseInt, parseInt,
+          [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseLength,
           rd.parseTenthDegreesToDegrees, rd.parseTenthDegreesToDegrees, null, null,
-          parseInt, KiCadLibReader._parseFillStyle, parseInt, parseInt,
-          parseInt, parseInt])
+          KiCadLibReader._parseLength, KiCadLibReader._parseFillStyle, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos,
+          KiCadLibReader._parseXPos, KiCadLibReader._parseYPos])
         break
       case 'T':
         // T orientation posx posy dimension unit convert Text
@@ -270,7 +270,7 @@ class KiCadLibReader {
         rd.readFieldsInto(shape, value,
           [null, 'orientation', 'x', 'y',
           'dimension', '__kicad_unit', '__kicad_convert', 'value'],
-          [null, KiCadLibReader._parseTextOrientation, KiCadLibReader._parseLength, KiCadLibReader._parseLengths,
+          [null, KiCadLibReader._parseTextOrientation, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos,
           parseInt, null, null, null])
         break
       case 'X':
@@ -283,8 +283,8 @@ class KiCadLibReader {
           [null, 'name', 'number', 'x', 'y',
           'length', 'orientation', 'numberDimension', 'nameDimension',
           '__kicad_unit', '__kicad_convert', 'electricalType', 'shape'],
-          [null, null, null, KiCadLibReader._parseLengthInt, KiCadLibReader._parseLengthInt,
-          KiCadLibReader._parseLengthInt, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
+          [null, null, null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos,
+          KiCadLibReader._parseLength, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
           null, null, null, null])
 
         shape = pin
@@ -343,15 +343,19 @@ class KiCadLibReader {
 
   static _parseWidth (value) {
     // TODO convert width values
-    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR).toString()
+    return parseInt(value) / KiCadLibReader.SCALE_FACTOR
   }
 
   static _parseLength (value) {
-    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR).toString()
+    return parseInt(value) / KiCadLibReader.SCALE_FACTOR
   }
 
-  static _parseLengthInt (value) {
-    return (parseInt(value) / KiCadLibReader.SCALE_FACTOR)
+  static _parseXPos (value) {
+    return KiCadLibReader._parseLength(value)
+  }
+
+  static _parseYPos (value) {
+    return -1 * KiCadLibReader._parseLength(value)
   }
 
   /**
@@ -398,11 +402,12 @@ class KiCadLibReader {
     }
   }
 
+  /**
+   * The y direction is reversed between KiCAD and EasyEDA for a library component
+   */
   _convertPoint (data, xName = 'x', yName = 'y') {
-        // TODO need to figure out how to scale from KiCAD to EasyEDA, but I need
-        // downloaded KiCAD to figure this out
     data[xName] = data[xName]
-    data[yName] = data[yName]
+    data[yName] = -1 * data[yName]
   }
 }
 

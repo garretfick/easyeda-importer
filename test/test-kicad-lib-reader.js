@@ -4,7 +4,6 @@
 
 const fs = require('fs')
 const should = require('should')
-const Point = require('../src/util/point')
 const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
 const EasyEdaFactory = require('../src/easyeda/easyeda-factory')
 
@@ -67,65 +66,66 @@ describe('KiCadLibReader', () => {
 
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.strokeWidth.should.equal('0')
+      shape.strokeWidth.should.equal(0)
       shape.fillColor.should.equal('#000000')
 
       shape.pointArr.should.eql([
-        {x: -5, y: 5},
+        {x: -5, y: -5},
         {x: 5, y: 0},
-        {x: -5, y: -5}])
+        {x: -5, y: 5}])
     })
 
     it('_readGraphic() rectangle', () => {
       let shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
+      // sx, sy, ex, ey
 
-      shape.x.should.equal('0')
-      shape.y.should.equal('5')
-      shape.width.should.equal('90')
-      shape.height.should.equal('85')
+      shape.x.should.equal(0)
+      shape.y.should.equal(-90)
+      shape.width.should.equal(90)
+      shape.height.should.equal(85)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.strokeWidth.should.equal('0')
+      shape.strokeWidth.should.equal(0)
       shape.fillColor.should.equal('none')
     })
 
     it('_readGraphic() circle', () => {
       let shape = reader._readGraphic('C 0 50 70 0 1 0 F')
 
-      shape.cx.should.equal('0')
-      shape.cy.should.equal('5')
-      shape.rx.should.equal('7')
-      shape.ry.should.equal('7')
+      shape.cx.should.equal(0)
+      shape.cy.should.equal(-5)
+      shape.rx.should.equal(7)
+      shape.ry.should.equal(7)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.strokeWidth.should.equal('0')
+      shape.strokeWidth.should.equal(0)
       shape.fillColor.should.equal('#000000')
     })
 
     it('_readGraphic() arc 1', () => {
       let shape = reader._readGraphic('A -1 -200 49 900 -11 0 1 0 N -50 -200 0 -150')
 
-      shape.x.should.equal(-1)
-      shape.y.should.equal(-200)
-      shape.radius.should.equal(49)
-      shape.startAngle.should.equal(90.0)
+      shape.x.should.equal(-0.1)
+      shape.y.should.equal(20.0)
+      shape.radius.should.equal(4.9)
+      shape.startAngle.should.equal(90)
       shape.endAngle.should.equal(-1.1)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.thickness.should.equal(0)
       shape.filled.should.be.false
-      shape.startPointX.should.equal(-50)
-      shape.startPointY.should.equal(-200)
+      shape.startPointX.should.equal(-5)
+      shape.startPointY.should.equal(20)
       shape.endPointX.should.equal(0)
-      shape.endPointY.should.equal(-150)
+      shape.endPointY.should.equal(15)
     })
 
     it('_readGraphic() arc 2', () => {
       let shape = reader._readGraphic('A 0 -199 49 0 -911 0 1 0 N 0 -150 50 -200')
 
       shape.x.should.equal(0)
-      shape.y.should.equal(-199)
-      shape.radius.should.equal(49)
+      shape.y.should.equal(19.9)
+      shape.radius.should.equal(4.9)
       shape.startAngle.should.equal(0)
       shape.endAngle.should.equal(-91.1)
       shape.__kicad_unit.should.equal('0')
@@ -133,9 +133,9 @@ describe('KiCadLibReader', () => {
       shape.thickness.should.equal(0)
       shape.filled.should.be.false
       shape.startPointX.should.equal(0)
-      shape.startPointY.should.equal(-150)
-      shape.endPointX.should.equal(50)
-      shape.endPointY.should.equal(-200)
+      shape.startPointY.should.equal(15)
+      shape.endPointX.should.equal(5)
+      shape.endPointY.should.equal(20)
     })
 
     it('_readGraphic() text', () => {
@@ -143,8 +143,8 @@ describe('KiCadLibReader', () => {
 
       // TODO this orientation is not handled correctly
       shape.orientation.should.equal('0')
-      shape.x.should.equal('-32')
-      shape.y.should.equal('-10')
+      shape.x.should.equal(-32)
+      shape.y.should.equal(1)
       shape.dimension.should.equal(100)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
@@ -209,10 +209,10 @@ describe('KiCadLibReader', () => {
       shape.name.should.equal('~')
       shape.number.should.equal('2')
       shape.x.should.equal(0)
-      shape.y.should.equal(25)
+      shape.y.should.equal(-25)
       shape.length.should.equal(20)
       shape.connectionPoint.x.should.equal(0)
-      shape.connectionPoint.y.should.equal(45)
+      shape.connectionPoint.y.should.equal(-5)
       shape.numberDimension.should.equal(40)
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')

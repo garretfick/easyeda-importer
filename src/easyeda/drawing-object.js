@@ -44,6 +44,8 @@ class DrawingObject
   }
 
   _objectToPrimitives (data) {
+    const stringPropNames = this._getStringProps()
+
     for (let member in data) {
       // Skip all items that begin with __ as internal only, not convertable
       if (member.startsWith('__')) {
@@ -58,10 +60,16 @@ class DrawingObject
         }
       } else if (typeof (value) === 'object') {
         this._objectToPrimitives(value)
+      } else if (stringPropNames.includes(member)) {
+        data[member] = data[member].toString()
       }
     }
 
     return data
+  }
+
+  _getStringProps () {
+    return []
   }
 }
 
