@@ -165,7 +165,7 @@ describe('KiCadLibReader', () => {
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
       shape.__kicad_convert.should.equal('1')
-      shape.electricalType.should.equal('P')
+      shape.electricalType.should.equal('0')
     })
 
     it('_readGraphic() pin 2 (left orientation)', () => {
@@ -182,7 +182,7 @@ describe('KiCadLibReader', () => {
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
       shape.__kicad_convert.should.equal('1')
-      shape.electricalType.should.equal('P')
+      shape.electricalType.should.equal('0')
     })
 
     it('_readGraphic() pin 3 (right orientation, 0 length)', () => {
@@ -199,7 +199,7 @@ describe('KiCadLibReader', () => {
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
       shape.__kicad_convert.should.equal('1')
-      shape.electricalType.should.equal('W')
+      shape.electricalType.should.equal('0')
       shape.shape.should.equal('NC')
     })
 
@@ -217,7 +217,7 @@ describe('KiCadLibReader', () => {
       shape.nameDimension.should.equal(40)
       shape.__kicad_unit.should.equal('1')
       shape.__kicad_convert.should.equal('1')
-      shape.electricalType.should.equal('P')
+      shape.electricalType.should.equal('0')
     })
 
     it('_readGraphic() unknown type throws error', () => {

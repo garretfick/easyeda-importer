@@ -3,7 +3,7 @@
 const SimpleShape = require('./simple-shape')
 
 /**
- * Polygon shape
+ * Polygon shape. A polygon is inherently a closed shape, whereas a polyline is open.
  */
 class Polygon extends SimpleShape
 {
@@ -15,6 +15,14 @@ class Polygon extends SimpleShape
 
     // {x: 0, y:0}
     this.pointArr = []
+  }
+
+  /**
+   * Copy this from a polyline.
+   */
+  initFromPolyline (polyline) {
+    Object.assign(this, polyline)
+    this.__type = 'polygon'
   }
 }
 

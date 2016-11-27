@@ -32,7 +32,7 @@ class Pin extends DrawingObject
       },
       configure: {
         display: 'show',
-        electric: '0',
+        electric: Pin.ELEC_TYPE_UNDEFINED,
         // gId: '',
         rotation: '0',
         spicePin: '1',
@@ -235,11 +235,32 @@ class Pin extends DrawingObject
 
     return this
   }
+
+  /**
+   * Set the electical type of the pin
+   */
+  set electricalType (type) {
+    this.data.configure.electric = type
+  }
+
+  /**
+   * Get the electrical type of the pin
+   * @return {string} The electrical type
+   */
+  get electricalType () {
+    return this.data.configure.electric
+  }
 }
 
 Pin.xyProps = ['configure', 'dot', 'name', 'num', 'pinDot']
 Pin.stringPoints = ['configure', 'dot', 'name', 'num']
 Pin.numberPoints = ['pinDot']
 Pin.pathProps = ['clock']
+
+Pin.ELEC_TYPE_UNDEFINED = '0'
+Pin.ELEC_TYPE_INPUT = '1'
+Pin.ELEC_TYPE_OUTPUT = '2'
+Pin.ELEC_TYPE_BIDIR = '3'
+Pin.ELEC_TYPE_POWER = '4'
 
 module.exports = Pin

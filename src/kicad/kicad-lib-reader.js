@@ -1,6 +1,7 @@
 'use strict'
 
 const rd = require('./kicad-base-reader')
+const Pin = require('../easyeda/pin')
 
 /**
  * Reader for the Kicad schematic library (LIB) format.
@@ -16,7 +17,6 @@ class KiCadLibReader {
   constructor (factory) {
     this.library = {}
     this.factory = factory
-    this.scaleFactor = 10
   }
 
   /**
@@ -188,7 +188,7 @@ class KiCadLibReader {
       case 'P':
         // Nb parts convert thickness x0 y0 x1 y1 ... xi yi cc
 
-        shape = this.factory.createPolygon()
+        shape = this.factory.createPolyline()
 
         // Read in the first part before the variable length section.
         let fields = value.split(' ')
@@ -212,6 +212,14 @@ class KiCadLibReader {
 
         // Finally, the last item is the fill
         shape.fillColor = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
+
+        // If we find that this is closed, then convert it to a polygon
+        if (shape.isClosed()) {
+          let temp = shape
+          shape = this.factory.createPolygon()
+          shape.initFromPolyline(temp)
+        }
+
         break
       case 'S':
         // S startx starty endx endy unit convert thickness cc
@@ -285,7 +293,7 @@ class KiCadLibReader {
           '__kicad_unit', '__kicad_convert', 'electricalType', 'shape'],
           [null, null, null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos,
           KiCadLibReader._parseLength, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
-          null, null, null, null])
+          null, null, KiCadLibReader._parseElecType, null])
 
         shape = pin
         break
@@ -386,6 +394,22 @@ class KiCadLibReader {
     }
 
     return rotation
+  }
+
+  static _parseElecType (value) {
+    switch (value) {
+      case 'I':
+        return Pin.ELEC_TYPE_INPUT
+      case 'O':
+        return Pin.ELEC_TYPE_OUTPUT
+      case 'B':
+        return Pin.ELEC_TYPE_BIDIR
+      case 'U':
+        return Pin.ELEC_TYPE_UNDEFINED
+      default:
+        // TODO give a message about unsupported type
+        return Pin.ELEC_TYPE_UNDEFINED
+    }
   }
 
   /**

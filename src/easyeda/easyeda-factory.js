@@ -6,6 +6,7 @@ const Ellipse = require('./ellipse')
 const Rect = require('./rect')
 const Pin = require('./pin')
 const Polygon = require('./polygon')
+const Polyline = require('./polyline')
 const SchLib = require('./schlib')
 
 /**
@@ -35,6 +36,13 @@ class EasyEdaFactory
    */
   createPolygon () {
     return new Polygon()
+  }
+
+  /**
+   * Create a new polyline drawing object
+   */
+  createPolyline () {
+    return new Polyline()
   }
 
   /**
