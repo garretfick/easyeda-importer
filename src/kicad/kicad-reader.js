@@ -128,8 +128,8 @@ class KiCadReader
       for (let index = 0; index < schematicData.length; ++index) {
         let line = schematicData[index]
 
-                // Each line is one of a few different types, all keyed based on the beginning
-                // of the line
+        // Each line is one of a few different types, all keyed based on the beginning
+        // of the line
         if (line.startsWith('Wire Wire Line')) {
           index = this._readWire(schematicData, index)
         } else if (line.startsWith('Entry Wire Line')) {

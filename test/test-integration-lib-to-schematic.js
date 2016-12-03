@@ -90,5 +90,34 @@ describe('Integration library to schematic', () => {
       // Validate there should be 4 ellipses
       component.should.have.property('ellipse').have.size(4)
     })
+
+    it('libraryToSchematic() creates CIRCLE library', () => {
+      const libContents = fs.readFileSync('test/kicad/integration/74xgxx.lib', 'utf8')
+
+      reader.addLibrarySource(libContents, 'SHAPES')
+      reader.libraryToSchematic(({compName}) => compName === 'CIRCLE')
+
+      const schematic = backend.getSchematic()
+
+      should.exist(schematic)
+
+      schematic.should.have.property('schlib')
+      schematic.should.have.property('itemOrder').have.length(1)
+
+      // Validate the created component in the schematic
+      const itemId = schematic.itemOrder[0]
+      schematic.schlib.should.have.property(itemId)
+
+      const component = schematic.schlib[itemId]
+
+      // Validate the head element
+      component.head.should.have.property('gId').which.equal(itemId)
+      component.head.should.have.property('x').which.equal('0')
+      component.head.should.have.property('y').which.equal('0')
+      component.head.should.have.property('importFlag').which.equal(0)
+
+      // Validate there should be 4 ellipses
+      component.should.have.property('ellipse').have.size(4)
+    })
   })
 })

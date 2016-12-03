@@ -8,9 +8,13 @@ or use a release (in the future) before you can use directly in EasyEDA.
 
 ## Build
 
-Run the following to build the source and generate a distribution file
+See CONTRIBUTING.md
 
-`npm run dist`
+## Compatibility Differences
 
-Build output files are generated in `dist`.
+EasyEDA and KiCAD formats are not fully compatible.
+
+### Symbol Pin Properties
+
+
 

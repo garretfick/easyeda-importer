@@ -1,3 +1,4 @@
+'use strict'
 
 const degrees2Rad = (degrees) => {
   return degrees * Math.PI / 180.0

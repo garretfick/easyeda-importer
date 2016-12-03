@@ -14,7 +14,7 @@ class KiCadLibReader {
    *
    * @param {EasyEdaFactory} factory Factory to create required objects
    */
-  constructor (factory) {
+  constructor (factory, messageHandler) {
     this.library = {}
     this.factory = factory
   }
@@ -79,62 +79,74 @@ class KiCadLibReader {
    * @param {array} libraryData
    */
   _readComponent (libraryData, index) {
+    // Wrap up the entire read into a try catch. There are some components we cannot
+    // read and these throw exceptions. If we encounter those, then we don't import
+    // that compoenent, but we do try to import others
     let schlibDef = {}
 
-    rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
-              'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
-              'units_locked', 'option_flag'
-          ], [null, null, null, null,
-              null, rd.parseYN, rd.parseYN, parseInt,
-              KiCadLibReader._parseIsIdenticalUnits, KiCadLibReader._parseIsPower
-          ])
+    try {
+      rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
+                'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
+                'units_locked', 'option_flag'
+            ], [null, null, null, null,
+                null, rd.parseYN, rd.parseYN, parseInt,
+                KiCadLibReader._parseIsIdenticalUnits, KiCadLibReader._parseIsPower
+            ])
 
-    if (libraryData[index].startsWith('ALIAS')) {
-      schlibDef.aliases = rd.readFieldsIntoArray(libraryData[index++], 1)
-    } else {
-      schlibDef.aliases = []
-    }
-
-    // Read the field values until we don't have any more
-    while (libraryData[index][0] === 'F') {
-      // TODO properly handle these
-      this._readLibraryField(libraryData[index], schlibDef)
-      index++
-    }
-
-    // Handle the $FPLIST, which is a list of footprint names for the component
-    if (libraryData[index].startsWith('$FPLIST')) {
-      let extraPackageNames = []
-      while (libraryData[++index] !== '$ENDFPLIST') {
-        extraPackageNames.push(libraryData[index].trim())
+      if (libraryData[index].startsWith('ALIAS')) {
+        schlibDef.aliases = rd.readFieldsIntoArray(libraryData[index++], 1)
+      } else {
+        schlibDef.aliases = []
       }
-      schlibDef.packages = extraPackageNames
-    }
 
-    // Read forward until the DRAW section, in case there are things we don't
-    // understand
-    index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
-
-    if (libraryData[index] === 'DRAW') {
-      schlibDef.graphics = []
-
-      // Move to the first line in the draw section
-      index++
-
-      // Read the inner draw section
-      while (!libraryData[index].startsWith('ENDDRAW')) {
-        schlibDef.graphics.push(this._readGraphic(libraryData[index++]))
+      // Read the field values until we don't have any more
+      while (libraryData[index][0] === 'F') {
+        // TODO properly handle these
+        this._readLibraryField(libraryData[index], schlibDef)
+        index++
       }
+
+      // Handle the $FPLIST, which is a list of footprint names for the component
+      if (libraryData[index].startsWith('$FPLIST')) {
+        let extraPackageNames = []
+        while (libraryData[++index] !== '$ENDFPLIST') {
+          extraPackageNames.push(libraryData[index].trim())
+        }
+        schlibDef.packages = extraPackageNames
+      }
+
+      // Read forward until the DRAW section, in case there are things we don't
+      // understand
+      index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
+
+      if (libraryData[index] === 'DRAW') {
+        schlibDef.graphics = []
+
+        // Move to the first line in the draw section
+        index++
+
+        // Read the inner draw section
+        while (!libraryData[index].startsWith('ENDDRAW')) {
+          schlibDef.graphics.push(this._readGraphic(libraryData[index++]))
+        }
+      }
+    } catch (e) {
+      // Caught an error, so don't read in this component
+      // TODO report the error
+      schlibDef = null
+    } finally {
+      // Read until the end of the component, do this whether we
+      // had an error or just got to the end of the component definition
+      index = rd.indexOfAny(['ENDDEF'], libraryData, index)
     }
 
-    // Read until the end of the component
-    index = rd.indexOfAny(['ENDDEF'], libraryData, index)
-
-    // Add to ourselves as the parsed data
-    if (this.library.hasOwnProperty(schlibDef.name)) {
-      throw Error('Library has more than one definition for ' + schlibDef.name)
+    if (schlibDef) {
+      // Add to ourselves as the parsed data
+      if (this.library.hasOwnProperty(schlibDef.name)) {
+        throw Error('Library has more than one definition for ' + schlibDef.name)
+      }
+      this.library[schlibDef.name] = schlibDef
     }
-    this.library[schlibDef.name] = schlibDef
 
     return index
   }
@@ -436,6 +448,5 @@ class KiCadLibReader {
 }
 
 KiCadLibReader.SCALE_FACTOR = 10
-
 
 module.exports = KiCadLibReader

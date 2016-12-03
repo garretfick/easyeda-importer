@@ -6,30 +6,22 @@
 
 'use strict'
 
-const fs = require('fs')
-const EasyEdaBackend = require('./easyeda/easyeda-backend')
-const KiCadReader = require('./kicad/kicad-reader')
+const fetch = require('whatwg-fetch')
+const lib2sch = require('./util/lib2sch')
 
-// Create the EasyEDA backend since that is our destination
-let backend = new EasyEdaBackend()
+// Asks the user for the location of the file to import
+let fileUrl = prompt('Enter the URL of the KiCAD library to import')
 
-// We are reading KiCAD libraries, so use that as the reader
-// and then connect the backend as the output for the reader
-let reader = new KiCadReader()
-reader.backend = backend
+// TODO should get this from the name of the file
+let libName = 'shapes'
 
-// Read the library that we want to convert and add it to the reader
-const libContents = fs.readFileSync('D:/Dev/easyeda-importer/test/kicad/shapes/shapes.lib', 'utf8')
-reader.addLibrarySource(libContents, 'OPAMP')
-
-// Convert a library into a schematic
-reader.libraryToSchematic()
-
-// Now we have a scheamtic, so get the data
-const schematicData = backend.getSchematic()
-
-console.log(schematicData)
-
-// Add finally call the EasyEDA function to create a new schematic
-// with the data
-api('applySource', {source: schematicData, createNew: true})
+fetch(fileUrl)
+  .then(response => {
+    response.text()
+  })
+  .then(fileData => {
+    lib2sch(fileData, libName)
+  })
+  .catch(error => {
+    alert(error)
+  })
