@@ -6,7 +6,7 @@
 
 'use strict'
 
-const fetch = require('whatwg-fetch')
+const {fetch} = require('fetch-ponyfill')()
 const lib2sch = require('./util/lib2sch')
 
 // Asks the user for the location of the file to import
@@ -15,13 +15,17 @@ let fileUrl = prompt('Enter the URL of the KiCAD library to import')
 // TODO should get this from the name of the file
 let libName = 'shapes'
 
-fetch(fileUrl)
+fetch(fileUrl, { credentials: 'same-origin' })
   .then(response => {
-    response.text()
+    if (response.ok) {
+      return response.text()
+    }
+    throw new Error('Unable to read from URL ' + fileUrl)
   })
   .then(fileData => {
     lib2sch(fileData, libName)
   })
   .catch(error => {
-    alert(error)
+    // For now, just forward this on to EasyEDA to display the error
+    throw error
   })
