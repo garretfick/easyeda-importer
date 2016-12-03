@@ -17,6 +17,7 @@ class KiCadLibReader {
   constructor (factory, messageHandler) {
     this.library = {}
     this.factory = factory
+    this.errors = []
   }
 
   /**
@@ -132,7 +133,8 @@ class KiCadLibReader {
       }
     } catch (e) {
       // Caught an error, so don't read in this component
-      // TODO report the error
+      this.errors.push(this._makeError(schlibDef, e, index))
+      // Since we cannot import it, set to null so we don't import it
       schlibDef = null
     } finally {
       // Read until the end of the component, do this whether we
@@ -444,6 +446,21 @@ class KiCadLibReader {
   _convertPoint (data, xName = 'x', yName = 'y') {
     data[xName] = data[xName]
     data[yName] = -1 * data[yName]
+  }
+
+  _makeError (libDef, error, index) {
+    let message = ''
+    if (libDef.name) {
+      message += 'Unable to read the def ' + libDef.name + '.'
+    }
+
+    message += error.message
+
+    if (index) {
+      message += ' Possibly around line ' + index
+    }
+
+    return new Error(message)
   }
 }
 

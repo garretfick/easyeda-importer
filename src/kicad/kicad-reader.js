@@ -18,6 +18,7 @@ class KiCadReader
     this.schematics = []
     this.schematicLibs = {}
     this.factory = new EasyEdaFactory()
+    this.errors = []
   }
 
   /**
@@ -32,6 +33,8 @@ class KiCadReader
   addLibrarySource (source, name) {
     let libReader = new KiCadLibReader(this.factory)
     let library = libReader.read(source)
+
+    this._mergeErrors(libReader.errors)
 
     this.schematicLibs[name] = library
   }
@@ -254,6 +257,11 @@ class KiCadReader
     // downloaded KiCAD to figure this out
     data[xName] = data[xName]
     data[yName] = data[yName]
+  }
+
+  _mergeErrors (errors, context) {
+    // TODO for now ignoring the context
+    this.errors = this.errors.concat(errors)
   }
 };
 

@@ -1,3 +1,5 @@
+'use strict'
+
 const EasyEdaBackend = require('../easyeda/easyeda-backend')
 const KiCadReader = require('../kicad/kicad-reader')
 
