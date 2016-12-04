@@ -85,12 +85,11 @@ class ConvertContext {
 
       // Iterate over the definitions in this library
       library.defs.forEach(compDef => {
-        const compName = compDef.name
-        // Check if we want to convert this one
-        if (!filter || filter({libName, compName})) {
-          // It might have aliases, and we convert those as separate
-          // components
-          compDef.names.forEach(name => {
+        // It might have aliases, and we convert those as separate
+        // components
+        compDef.names.forEach(name => {
+          // Check if we want to convert this one
+          if (!filter || filter({libName, name})) {
             // Create the instance that can exist on a schematic
             const compLibInst = compDef.toInstance(name)
 
@@ -99,8 +98,8 @@ class ConvertContext {
 
             // Add it to the current schematic
             backend.addCompInst(compLibInst)
-          })
-        }
+          }
+        })
       })
     })
 

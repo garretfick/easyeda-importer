@@ -53,6 +53,7 @@ describe('Integration library to schematic', () => {
 
       // Validate the annotiations (the refdes and component name fields)
       component.should.have.property('annotation').have.size(4)
+      component.annotation.gge3.string.should.equal('U1')
     })
 
     it('libraryToSchematic() creates CIRCLE library', () => {
