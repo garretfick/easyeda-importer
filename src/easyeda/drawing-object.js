@@ -45,6 +45,7 @@ class DrawingObject
 
   _objectToPrimitives (data) {
     const stringPropNames = this._getStringProps()
+    const intBoolPropNames = this._getIntBoolProps()
 
     const primitives = {}
 
@@ -57,6 +58,8 @@ class DrawingObject
       let value = data[member]
       if (stringPropNames.includes(member)) {
         primitives[member] = value.toString()
+      } else if (intBoolPropNames.includes(member)) {
+        primitives[member] = value ? 1 : 0
       } else {
         primitives[member] = deepcopy(value)
       }
@@ -65,7 +68,25 @@ class DrawingObject
     return primitives
   }
 
+  /**
+   * Get the names of attributes that need to be converted to strings
+   * for EasyEDA format.
+   *
+   * @return {[string]} The names of the properties that need to be converted
+   * to strings.
+   */
   _getStringProps () {
+    return []
+  }
+
+  /**
+   * Get the names of attributes that need to be converted to integer represented booleans
+   * for EasyEDA format.
+   *
+   * @return {[string]} The names of the properties that need to be converted
+   * to integer booleans.
+   */
+  _getIntBoolProps () {
     return []
   }
 }

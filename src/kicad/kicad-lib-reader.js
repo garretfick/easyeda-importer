@@ -102,7 +102,7 @@ class KiCadLibReader {
     let schlibDef = this.factory.createCompDef()
 
     try {
-      rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
+      rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'refDesPrefix', null,
                 'text_offset', 'draw_pinnumnber', 'draw_pinname', 'unit_count',
                 'units_locked', 'option_flag'
             ], [null, null, null, null,
@@ -118,8 +118,23 @@ class KiCadLibReader {
 
       // Read the field values until we don't have any more
       while (libraryData[index][0] === 'F') {
-        // TODO properly handle these
-        this._readLibraryField(libraryData[index], schlibDef)
+        // There are several kinds of fields, depending on the Fx value. The KiCAD representation
+        // is essentially an annotation, so start with that
+        const annotation = this._readLibraryField(libraryData[index], schlibDef)
+        switch (annotation.__kicad_field) {
+          case 0:
+            // Reference designator, e.g. U1
+            schlibDef.setRefDesAnnotation(annotation)
+            break
+          case 1:
+            // Value, e.g. name of the compoent UA741
+            schlibDef.setNameAnnotation(annotation)
+            break
+          default:
+            // Others are all just regular annotations
+            schlibDef.graphics.push(annotation)
+            break
+        }
         index++
       }
 
@@ -137,8 +152,6 @@ class KiCadLibReader {
       index = rd.indexOfAny(['DRAW', 'ENDDEF'], libraryData, index)
 
       if (libraryData[index] === 'DRAW') {
-        schlibDef.graphics = []
-
         // Move to the first line in the draw section
         index++
 
@@ -177,32 +190,45 @@ class KiCadLibReader {
      * @param {object} schLibDef The library definition to read into
      */
   _readLibraryField (value, schLibDef) {
-    let item = {}
+    let item = this.factory.createAnnotation()
 
-        // parseInt stops at the first non-integer character, so the spaces at the end are ok
-    item.field = parseInt(value.substr(1))
+    // parseInt stops at the first non-integer character, so the spaces at the end are ok
+    item.__kicad_field = parseInt(value.substr(1))
 
-        // We cannot use the normal read into object because the item may have spaces
-        // so first find the enclosing double quotes
+    // We cannot use the normal read into object because the item may have spaces
+    // so first find the enclosing double quotes
     let startText = value.indexOf('"', 2)
     let endText = value.indexOf('"', startText + 1)
     item.value = value.substr(startText + 1, endText - startText - 1)
 
-        // The field might have a name, and we can detect this by finding
-        // double quotes after the first set
+    // The field might have a name, and we can detect this by finding
+    // double quotes after the first set
     let startName = value.indexOf('"', endText + 1)
     let endName = startName > -1 ? value.indexOf('"', startName + 1) : -1
     item.name = startName > -1 ? value.substr(startName + 1, endName - startName - 1) : null
 
-        // The middle part of the string are the properties. Get the substr for the
-        // part that forms the properties (so we don't have to split on the end name
-        // if it exists)
-    let propertiesValue = startName > -1 ? value.substr(endText + 1, startName - endText - 1) : value.substr(endText)
+    // The middle part of the string are the properties. Get the substr for the
+    // part that forms the properties (so we don't have to split on the end name
+    // if it exists)
+    let propertiesValue = startName > -1 ? value.substr(endText + 1, startName - endText - 1) : value.substr(endText + 1)
 
-        // Read the part of the value after the string identifier. We trim the properties value
-        // since we really don't know how many extra spaces it might have
-    let fields = {}
-    rd.readFieldsInto(fields, propertiesValue.trim(), ['x', 'y', 'dimension', 'orientation', 'visibility', 'format'], [parseInt, parseInt, parseInt, null, null, null])
+    // Read the part of the value after the string identifier. We trim the properties value
+    // since we really don't know how many extra spaces it might have
+    // EasyEDA doesn't support text orientation, so we just ignore that for now
+    rd.readFieldsInto(item, propertiesValue.trim(),
+      ['x', 'y', 'dimension', '__kicad_orientation', 'visible', 'textAnchor', '__kicad_format'],
+      [KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, parseInt, null, KiCadLibReader._parseVisibility, KiCadLibReader._parseTextAnchor, null])
+
+    // For text items, the valign, bold and italic are all packed into the same item
+    // (and they are optional). If they exist, then set them
+    if (item.__kicad_format.length === 3) {
+      item.fontStyle = rd.parseOptions(item.__kicad_format[1], { I: 'italic', N: '' })
+      item.fontWeight = rd.parseOptions(item.__kicad_format[2], { B: 'bold', N: '' })
+    }
+
+    if (item.__kicad_orientation !== 'H') {
+      this._makeWarning(schLibDef, 'Unsupported text orientation for attribute')
+    }
 
     return item
   }
@@ -397,6 +423,20 @@ class KiCadLibReader {
   }
 
   /**
+   * Read visibility of fields (Fx values)
+   */
+  static _parseVisibility (value) {
+    return rd.parseOptions(value, { V: true, I: false })
+  }
+
+  /**
+   * Read text anchor of fields (Fx values)
+   */
+  static _parseTextAnchor (value) {
+    return rd.parseOptions(value, { L: 'start', R: 'middle', C: 'end' })
+  }
+
+  /**
    * Parsing the pin orientiation means reading in the data, and then applying the appropriate
    * transform for the pin object. We do this by returning the appropriate rotation
    * and then the name of the property we are setting knows to rotate about the origin of the pin.
@@ -465,6 +505,21 @@ class KiCadLibReader {
   }
 
   _makeError (libDef, error, index) {
+    let message = ''
+    if (libDef.name) {
+      message += 'Unable to read the def ' + libDef.name + '.'
+    }
+
+    message += error.message
+
+    if (index) {
+      message += ' Possibly around line ' + index
+    }
+
+    return new Error(message)
+  }
+
+  _makeWarning (libDef, error, index) {
     let message = ''
     if (libDef.name) {
       message += 'Unable to read the def ' + libDef.name + '.'

@@ -33,6 +33,13 @@ class SchLib extends DrawingObject
   }
 
   /**
+   * Assign the reference designator for the instance.
+   */
+  set refDes (refDes) {
+
+  }
+
+  /**
    * Add a graphic to the shape
    *
    * @param {object} item The graphic shape to add
@@ -69,5 +76,8 @@ class SchLib extends DrawingObject
     return { primitives: data, id: data.head.gId }
   }
 }
+
+SchLib.KIND_REFDES = 'refdes'
+SchLib.KIND_NAME = 'name'
 
 module.exports = SchLib

@@ -29,13 +29,26 @@ describe('KiCadLibReader', () => {
       libItem.packages.should.have.length(1)
       libItem.packages[0].should.equal('TO*')
 
-      libItem.graphics.should.have.length(6)
-      // TODO test more properties
+      // There are 4 fields here, plus 5 pins and 1 polygon
+      libItem.graphics.should.have.length(10)
     })
   })
 
   describe('#_readLibraryField()', () => {
     let reader = new KiCadLibReader(new EasyEdaFactory())
+
+    it('_readLibraryField() simple value', () => {
+      const field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CNN')
+
+      field.should.have.property('value')
+      field.value.should.equal('DIODE')
+
+      field.should.have.property('name')
+      should.not.exist(field.name)
+
+      field.fontWeight.should.equal('')
+      field.fontStyle.should.equal('')
+    })
 
     it('_readLibraryField() simple value', () => {
       const field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
@@ -45,6 +58,9 @@ describe('KiCadLibReader', () => {
 
       field.should.have.property('name')
       should.not.exist(field.name)
+
+      field.fontWeight.should.equal('bold')
+      field.fontStyle.should.equal('italic')
     })
 
     it('_readLibraryField() has name field', () => {

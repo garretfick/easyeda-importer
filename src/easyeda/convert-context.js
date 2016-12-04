@@ -1,6 +1,7 @@
 'use strict'
 
 const EasyEdaFactory = require('./easyeda-factory')
+const RefDesGenerator = require('./refdes-generator')
 
 /**
  * The main context of the conversion. This holds the defintion of libraries we needed
@@ -69,24 +70,32 @@ class ConvertContext {
    * @param {EasyEdaBackend} backend The backend destination for the serialized data
    * @param {function} function If defined, a function to decide if the component should be converted
    * Arguments are an object with the shape { libName: <string>, compName: <string> }
+   * @param {RefDesGenerator} refDesGenerator Generator for unique RefDes when a component is instantiated
    */
-  librariesToSchematic (backend, filter) {
+  librariesToSchematic (backend, filter, refDesGenerator) {
+    if (!refDesGenerator) {
+      refDesGenerator = new RefDesGenerator()
+    }
+
     backend.beginSchematicContext()
 
     // Get the library from the read libraries
     Object.keys(this.libs).forEach(libName => {
-      let library = this.libs[libName]
+      const library = this.libs[libName]
 
       // Iterate over the definitions in this library
       library.defs.forEach(compDef => {
-        let compName = compDef.name
+        const compName = compDef.name
         // Check if we want to convert this one
         if (!filter || filter({libName, compName})) {
           // It might have aliases, and we convert those as separate
           // components
           compDef.names.forEach(name => {
             // Create the instance that can exist on a schematic
-            let compLibInst = compDef.toInstance(name)
+            const compLibInst = compDef.toInstance(name)
+
+            const prefix = compDef.refDesPrefix
+            compLibInst.refDes = refDesGenerator.nextRefDes(prefix)
 
             // Add it to the current schematic
             backend.addCompInst(compLibInst)

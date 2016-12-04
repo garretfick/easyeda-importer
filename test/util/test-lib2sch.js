@@ -50,6 +50,9 @@ describe('Integration library to schematic', () => {
       // in other tests
       const polygon = component.polygon[Object.keys(component.polygon)[0]]
       polygon.should.have.properties(['fillColor', 'pointArr', 'strokeColor', 'strokeStyle', 'strokeWidth'])
+
+      // Validate the annotiations (the refdes and component name fields)
+      component.should.have.property('annotation').have.size(4)
     })
 
     it('libraryToSchematic() creates CIRCLE library', () => {

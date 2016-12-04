@@ -22,7 +22,7 @@ class Annotation extends DrawingObject
     this.string = ''
     this.textAnchor = 'start'
     this.type = 'comment'
-    this.visible = 1
+    this.visible = true
     this.x = 0
     this.y = 0
   }
@@ -32,11 +32,15 @@ class Annotation extends DrawingObject
     this.y += dy
   }
 
-    /**
+  /**
    * @see SimpleShape._getStringProps()
    */
   _getStringProps () {
     return super._getStringProps().concat(['x', 'y'])
+  }
+
+  _getIntBoolProps () {
+    return super._getIntBoolProps().concat(['visible'])
   }
 }
 
