@@ -2,6 +2,9 @@
 
 const Annotation = require('./annotation')
 const Arc = require('./arc')
+const CompDef = require('./comp-def')
+const CompLibrary = require('./comp-library')
+const Document = require('./document')
 const Ellipse = require('./ellipse')
 const Rect = require('./rect')
 const Pin = require('./pin')
@@ -78,40 +81,19 @@ class EasyEdaFactory
   }
 
   createSchematic () {
-    return {
-      BBox: {
-        height: 310,
-        width: 156.4,
-        x: 83.6,
-        y: -10
-      },
-      canvas: {
-        altSnapSize: '5',
-        backGround: '#FFFFFF',
-        canvasHeight: 1000,
-        canvasWidth: 1000,
-        gridColor: '#CCCCCC',
-        gridSize: '10',
-        gridStyle: 'line',
-        gridVisible: 'yes',
-        originX: 0,
-        originY: 0,
-        snapSize: '10',
-        unit: 'pixel',
-        viewHeight: 1000,
-        viewWidth: 1000
-      },
-      head: {
-        c_para: 'Prefix Start 1',
-        c_spiceCmd: null,
-        docType: '1',
-        importFlag: undefined,
-        portOfADImportHack: '',
-        spiceConfigure: '',
-        transformList: ''
-      },
-      itemOrder: []
-    }
+    return new Document()
+  }
+
+  createCompDef () {
+    return new CompDef()
+  }
+
+  /**
+   * Create a new component library instance. This is not a native EasyEDA object.
+   * It is useful for conversion only.
+   */
+  createCompLibrary () {
+    return new CompLibrary()
   }
 }
 

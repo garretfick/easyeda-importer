@@ -16,27 +16,8 @@ class KiCadReader
   constructor () {
     this.backend = null
     this.schematics = []
-    this.schematicLibs = {}
     this.factory = new EasyEdaFactory()
     this.errors = []
-  }
-
-  /**
-   * Add the library to the reader. You should add required libraries to the reader
-   * prior to reading a schematic
-   *
-   * @param {string} source The read library contents
-   *
-   * @param {string} name The name of the library (usually this is the file name without the extension).
-   * This name is used to find the library when reading schematics
-   */
-  addLibrarySource (source, name) {
-    let libReader = new KiCadLibReader(this.factory)
-    let library = libReader.read(source)
-
-    this._mergeErrors(libReader.errors)
-
-    this.schematicLibs[name] = library
   }
 
   /**
@@ -46,39 +27,6 @@ class KiCadReader
    */
   addSchematicSource (source) {
     this.schematics.push(source)
-  }
-
-  /**
-   * Convert a library into EasyEDA schematic. Use this to import the entire contents of a KiCAD
-   * library into an EasyEDA schematic. This will import the library by placing all components
-   * in the library into a schematic.
-   *
-   * You must have first added the library source to the reader (see KiCadReader.addLibrarySource)
-   *
-   * For example:
-   *
-   * reader = new KiCadReader()
-   * reader.addLibrarySource(stream, 'OPAMPS')
-   * reader.libraryToSchematic('OPAMPS')
-   * reader.getSchematic()
-   *
-   * @param {function} function If defined, a function to decide if the component should be converted
-   * Arguments are an object with the shape { libName: <string>, compName: <string> }
-   */
-  libraryToSchematic (filter) {
-    this.backend.beginSchematicContext()
-
-    // Get the library from the read libraries
-    Object.keys(this.schematicLibs).forEach(libName => {
-      let library = this.schematicLibs[libName]
-      Object.keys(library).forEach(compName => {
-        if (!filter || filter({libName, compName})) {
-          this._convertLibraryComponent(library[compName])
-        }
-      })
-    })
-
-    this.backend.endSchematicContext()
   }
 
   /**
@@ -227,29 +175,6 @@ class KiCadReader
     this._convertPoint(junctionDef)
 
     // TODO probably need to store this for later
-  }
-
-  /**
-   * Convert the component definition (from the library) into the format
-   * for EasyEDA
-   *
-   * @param {object} component The component to convert
-   */
-  _convertLibraryComponent (component) {
-    try {
-      let libComponent = this.backend.beginSchComponentContext()
-
-      // TODO This might be wrong - it needs to be checked later
-      libComponent.head.x = '0'
-      libComponent.head.y = '0'
-
-      for (let index = 0; index < component.graphics.length; ++index) {
-        let graphicItem = component.graphics[index]
-        this.backend.addDrawingObject(graphicItem, graphicItem.type)
-      }
-    } finally {
-      this.backend.endSchComponentContext()
-    }
   }
 
   _convertPoint (data, xName = 'x', yName = 'y') {

@@ -40,8 +40,13 @@ class EasyEdaBackend {
    * This is mostly just boiler place determined by outputting the JSON from EasyEDA
    */
   beginSchematicContext () {
-    let schematic = this.factory.createSchematic()
-    this._pushContext(schematic)
+    const schematic = this.factory.createSchematic()
+
+    // We want this as a writable schematic, so immediately convert
+    // this to the primitive representation
+    const { primitives, id } = schematic.toPrimitives(this.idGenerator)
+
+    this._pushContext(primitives)
   }
 
   /**
@@ -49,6 +54,23 @@ class EasyEdaBackend {
    */
   endSchematicContext () {
     return this._popContext()
+  }
+
+  /**
+   * Add a component instance into our current context.
+   * This converts the data to basic primitives and assigns
+   * all required IDs.
+   *
+   * @param {SchLib} compInst The component instance to add to the context
+   */
+  addCompInst (compInst) {
+    // Get the primitives only represetation of the instance
+    let { primitives, id } = compInst.toPrimitives(this.idGenerator)
+
+    // Add it to the list of items for the schematic
+    this._addObject(primitives, id, 'schlib')
+
+    return this
   }
 
   /**

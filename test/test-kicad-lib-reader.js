@@ -16,12 +16,12 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readLibrary() read library with one component', () => {
-      let libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
-      let library = reader._readLibrary(libContents)
+      const libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
+      const library = reader.read(libContents)
 
-      library.should.have.property('LM1875')
+      library.hasCompDef('LM1875').should.be.true
 
-      let libItem = library['LM1875']
+      const libItem = library.find('LM1875')
       libItem.should.have.property('aliases')
 
       libItem.should.have.property('packages')
@@ -38,7 +38,7 @@ describe('KiCadLibReader', () => {
     let reader = new KiCadLibReader(new EasyEdaFactory())
 
     it('_readLibraryField() simple value', () => {
-      let field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
+      const field = reader._readLibraryField('F1 "DIODE" 0 -100 50 H V L CIB')
 
       field.should.have.property('value')
       field.value.should.equal('DIODE')
@@ -48,7 +48,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readLibraryField() has name field', () => {
-      let field = reader._readLibraryField('F2 "2euros" 0 -200 50 H V L CIB "PRICE"')
+      const field = reader._readLibraryField('F2 "2euros" 0 -200 50 H V L CIB "PRICE"')
 
       field.should.have.property('value')
       field.value.should.equal('2euros')
@@ -62,7 +62,7 @@ describe('KiCadLibReader', () => {
     let reader = new KiCadLibReader(new EasyEdaFactory())
 
     it('_readGraphic() polygon 1', () => {
-      let shape = reader._readGraphic('P 3 0 1 0 -50 50 50 0 -50 -50 F')
+      const shape = reader._readGraphic('P 3 0 1 0 -50 50 50 0 -50 -50 F')
 
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
@@ -76,7 +76,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() rectangle', () => {
-      let shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
+      const shape = reader._readGraphic('S 0 50 900 900 0 1 0 f')
       // sx, sy, ex, ey
 
       shape.x.should.equal(0)
@@ -90,7 +90,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() circle', () => {
-      let shape = reader._readGraphic('C 0 50 70 0 1 0 F')
+      const shape = reader._readGraphic('C 0 50 70 0 1 0 F')
 
       shape.cx.should.equal(0)
       shape.cy.should.equal(-5)
@@ -103,7 +103,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() arc 1', () => {
-      let shape = reader._readGraphic('A -1 -200 49 900 -11 0 1 0 N -50 -200 0 -150')
+      const shape = reader._readGraphic('A -1 -200 49 900 -11 0 1 0 N -50 -200 0 -150')
 
       shape.x.should.equal(-0.1)
       shape.y.should.equal(20.0)
@@ -121,7 +121,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() arc 2', () => {
-      let shape = reader._readGraphic('A 0 -199 49 0 -911 0 1 0 N 0 -150 50 -200')
+      const shape = reader._readGraphic('A 0 -199 49 0 -911 0 1 0 N 0 -150 50 -200')
 
       shape.x.should.equal(0)
       shape.y.should.equal(19.9)
@@ -139,7 +139,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() text', () => {
-      let shape = reader._readGraphic('T 0 -320 -10 100 0 1 VREF')
+      const shape = reader._readGraphic('T 0 -320 -10 100 0 1 VREF')
 
       // TODO this orientation is not handled correctly
       shape.orientation.should.equal('0')
@@ -152,7 +152,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() pin 1 (right orientation)', () => {
-      let shape = reader._readGraphic('X TO 1 200 0 150 R 40 40 1 1 P')
+      const shape = reader._readGraphic('X TO 1 200 0 150 R 40 40 1 1 P')
 
       shape.name.should.equal('TO')
       shape.number.should.equal('1')
@@ -169,7 +169,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() pin 2 (left orientation)', () => {
-      let shape = reader._readGraphic('X K 2 200 0 150 L 40 40 1 1 P')
+      const shape = reader._readGraphic('X K 2 200 0 150 L 40 40 1 1 P')
 
       shape.name.should.equal('K')
       shape.number.should.equal('2')
@@ -186,7 +186,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() pin 3 (right orientation, 0 length)', () => {
-      let shape = reader._readGraphic('X 0 1 0 0 0 R 40 40 1 1 W NC')
+      const shape = reader._readGraphic('X 0 1 0 0 0 R 40 40 1 1 W NC')
 
       shape.name.should.equal('0')
       shape.number.should.equal('1')
@@ -204,7 +204,7 @@ describe('KiCadLibReader', () => {
     })
 
     it('_readGraphic() pin 4 (up direction)', () => {
-      let shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
+      const shape = reader._readGraphic('X ~ 2 0 250 200 U 40 40 1 1 P')
 
       shape.name.should.equal('~')
       shape.number.should.equal('2')

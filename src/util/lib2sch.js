@@ -1,34 +1,35 @@
 'use strict'
 
+const ConvertContext = require('../easyeda/convert-context')
 const EasyEdaBackend = require('../easyeda/easyeda-backend')
-const KiCadReader = require('../kicad/kicad-reader')
+const KiCadLibReader = require('../kicad/kicad-lib-reader')
 
 /**
  * Convert a library to schematic.
  *
  * @param {string} libContents The read library contents (either read from disk or fetched)
- * @param {libName} libName The name of the library
+ * @param {string} libName The name of the library that is being read
+ * @param {object} options Conversion options. This has the shape:
+ * {
+ *  instFilter => function
+ * }
  * @param {function} easyEdaApi The API function to import into EasyEDA. If null, use the globally defined API
  */
-const lib2sch = (libContents, libName, easyEdaApi = null) => {
-  // Create the EasyEDA backend since that is our destination
+const lib2sch = (libContents, libName, options = {}, easyEdaApi = null) => {
+  // Create the context for reading and converting
+  let context = new ConvertContext()
+
+  // Read the library into the context
+  KiCadLibReader.readToContext(libContents, options.libName, context)
+
+  // Create the backend as the destination for the conversion
   let backend = new EasyEdaBackend()
 
-  // We are reading KiCAD libraries, so use that as the reader
-  // and then connect the backend as the output for the reader
-  let reader = new KiCadReader()
-  reader.backend = backend
-
-  // Read the library that we want to convert and add it to the reader
-  reader.addLibrarySource(libContents, libName)
-
-  // Convert a library into a schematic
-  reader.libraryToSchematic()
+  // Write the context into the backend
+  context.librariesToSchematic(backend, options.instFilter)
 
   // Now we have a scheamtic, so get the data
   const schematicData = backend.getSchematic()
-
-  console.log(schematicData)
 
   // Add finally call the EasyEDA function to create a new schematic
   // with the data

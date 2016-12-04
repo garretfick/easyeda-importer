@@ -39,6 +39,7 @@
     ]
   },
   "dependencies": {
+    "deepcopy": "0.6.3",
     "fetch-ponyfill": "3.0.2",
     "svg-pathdata": "1.0.4"
   }

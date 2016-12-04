@@ -10,12 +10,27 @@ const Pin = require('../easyeda/pin')
  */
 class KiCadLibReader {
   /**
+   * Construct an instance of the library reader and read the library into the specified
+   * context.
+   *
+   * @param {string} librarySource The library data to read in
+   * @param {string} name The name of the library (since KiCAD doesn't internally know it)
+   * @param {ConvertContext} context The conversion context (destination for all data)
+   */
+  static readToContext (librarySource, name, context) {
+    const reader = new KiCadLibReader(context.factory)
+    const library = reader.read(librarySource)
+    context.addCompLibrary(library, name)
+    context.mergeErrors(reader.errors)
+  }
+
+  /**
    * Create the KiCadLibReader
    *
    * @param {EasyEdaFactory} factory Factory to create required objects
    */
-  constructor (factory, messageHandler) {
-    this.library = {}
+  constructor (factory) {
+    this.library = null
     this.factory = factory
     this.errors = []
   }
@@ -27,6 +42,7 @@ class KiCadLibReader {
    * @param {string} source The read library data
    */
   read (source) {
+    this.library = this.factory.createCompLibrary()
     this._readLibrary(source)
     return this.library
   }
@@ -34,8 +50,8 @@ class KiCadLibReader {
   /**
    * Evil function, but useful for testing for now
    */
-  _readLines (library) {
-    return library.split('\n').map((line) => {
+  _readLines (libraryText) {
+    return libraryText.split('\n').map((line) => {
       return line.trim()
     })
   }
@@ -50,8 +66,8 @@ class KiCadLibReader {
    * @return {object} The read library. The keys in the returned data are the
    * names of compoents in the library. The values are the parsed data
    */
-  _readLibrary (library) {
-    let libraryData = this._readLines(library)
+  _readLibrary (libraryText) {
+    let libraryData = this._readLines(libraryText)
 
     // Validate that we have found a library
     if (libraryData.length <= 2 || !libraryData[0].startsWith('EESchema-LIBRARY Version 2.')) {
@@ -83,7 +99,7 @@ class KiCadLibReader {
     // Wrap up the entire read into a try catch. There are some components we cannot
     // read and these throw exceptions. If we encounter those, then we don't import
     // that compoenent, but we do try to import others
-    let schlibDef = {}
+    let schlibDef = this.factory.createCompDef()
 
     try {
       rd.readFieldsInto(schlibDef, libraryData[index++], [null, 'name', 'reference', null,
@@ -144,10 +160,10 @@ class KiCadLibReader {
 
     if (schlibDef) {
       // Add to ourselves as the parsed data
-      if (this.library.hasOwnProperty(schlibDef.name)) {
+      if (this.library.hasCompDef(schlibDef.name)) {
         throw Error('Library has more than one definition for ' + schlibDef.name)
       }
-      this.library[schlibDef.name] = schlibDef
+      this.library.addCompDef(schlibDef)
     }
 
     return index

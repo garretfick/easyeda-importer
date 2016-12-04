@@ -1,5 +1,6 @@
 'use strict'
 
+const deepcopy = require('deepcopy')
 const DrawingObject = require('./drawing-object')
 const Point = require('../util/point')
 const SVGPathData = require('svg-pathdata')
@@ -74,7 +75,7 @@ class Pin extends DrawingObject
    * @param {GidGenerator} idGenerator Class to generate new IDs when converting to primitives
    */
   toPrimitives (idGenerator) {
-    let primitives = Object.assign({}, this.data)
+    let primitives = deepcopy(this.data)
 
     // Now convert the members that need to be converted. First handle xy values
     // converting to strings

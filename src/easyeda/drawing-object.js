@@ -1,5 +1,7 @@
 'use strict'
 
+const deepcopy = require('deepcopy')
+
 /**
  * Base class for all EasyEDA primitives. This provides the implementation to recursively
  * convert.
@@ -19,10 +21,8 @@ class DrawingObject
   }
 
   /**
-   * Get this object as the primitive only serialization. This permanently and destructively
-   * changes the object contents. The object is no longer valid after this convertion.
-   *
-   * If you need to keep the object around, then you must clone it first.
+   * Get this object as the primitive only serialization. This does not change the
+   * object itself. The original object stays in tact
    *
    * @param {GidGenerator} idGenerator Generates unique IDs for nested objects
    *
@@ -30,42 +30,39 @@ class DrawingObject
    * understood by EasyEDA.
    */
   toPrimitives (idGenerator) {
-    let data = this._primitiveData()
+    const data = this._primitiveData()
 
     // Do a search for any members in the data that need conversion. This is a basic recursive
     // tree visit, where if we find any converable object, then we replace the member
     // data by calling it's toPrimitives function
-    this._objectToPrimitives(data)
+    const primitives = this._objectToPrimitives(data)
 
     // Assign this object an identifier since we are creating an instance
-    data.gId = idGenerator.nextGid()
+    primitives.gId = idGenerator.nextGid()
 
-    return { primitives: data, id: data.gId }
+    return { primitives: primitives, id: primitives.gId }
   }
 
   _objectToPrimitives (data) {
     const stringPropNames = this._getStringProps()
 
+    const primitives = {}
+
     for (let member in data) {
       // Skip all items that begin with __ as internal only, not convertable
       if (member.startsWith('__')) {
-        delete data[member]
         continue
       }
 
       let value = data[member]
-      if (Array.isArray(value)) {
-        for (let index = 0; index < value.length; ++index) {
-          value[index] = this._objectToPrimitives(value[index])
-        }
-      } else if (typeof (value) === 'object') {
-        this._objectToPrimitives(value)
-      } else if (stringPropNames.includes(member)) {
-        data[member] = data[member].toString()
+      if (stringPropNames.includes(member)) {
+        primitives[member] = value.toString()
+      } else {
+        primitives[member] = deepcopy(value)
       }
     }
 
-    return data
+    return primitives
   }
 
   _getStringProps () {
