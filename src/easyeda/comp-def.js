@@ -1,6 +1,7 @@
 'use strict'
 
 const deepcopy = require('deepcopy')
+const Annotation = require('./annotation')
 const SchLib = require('./schlib')
 
 /**
@@ -12,7 +13,7 @@ class CompDef
   constructor () {
     this.graphics = []
   }
-  
+
   /**
    * Create an instance of this defintion.
    *
@@ -35,13 +36,13 @@ class CompDef
 
   setRefDesAnnotation (annotation) {
     // TODO this should remove any existing, but not needed now
-    annotation.__kind = SchLib.KIND_REFDES
+    annotation.isRefDes = true
     this.graphics.push(annotation)
   }
 
   setNameAnnotation (annotation) {
     // TODO this should remove any existing, but not needed now
-    annotation.__kind = SchLib.KIND_REFDES
+    annotation.isName = true
     this.graphics.push(annotation)
   }
 

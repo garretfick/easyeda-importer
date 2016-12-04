@@ -36,7 +36,14 @@ class SchLib extends DrawingObject
    * Assign the reference designator for the instance.
    */
   set refDes (refDes) {
+    // Find the annotation that represents the RefDes and set the value for it
+    const annotation = this.children.find(graphic => {
+      return graphic.__type === 'annotation' && graphic.isRefDes
+    })
 
+    if (annotation) {
+      annotation.string = refDes
+    }
   }
 
   /**
@@ -76,8 +83,5 @@ class SchLib extends DrawingObject
     return { primitives: data, id: data.head.gId }
   }
 }
-
-SchLib.KIND_REFDES = 'refdes'
-SchLib.KIND_NAME = 'name'
 
 module.exports = SchLib
