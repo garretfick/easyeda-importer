@@ -89,7 +89,7 @@ class ConvertContext {
         // components
         compDef.names.forEach(name => {
           // Check if we want to convert this one
-          if (!filter || filter({libName, name})) {
+          if (!filter || filter({libraryName: libName, componentName: name})) {
             // Create the instance that can exist on a schematic
             const compLibInst = compDef.toInstance(name)
 

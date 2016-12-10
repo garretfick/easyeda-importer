@@ -9,7 +9,12 @@
 const fs = require('fs')
 const lib2sch = require('./util/lib2sch')
 
-// Read the library that we want to convert and add it to the reader
-const libContents = fs.readFileSync('D:/Dev/easyeda-importer/test/kicad/shapes/shapes.lib', 'utf8')
+const {dialog} = require('electron').remote
+const filePaths = dialog.showOpenDialog({properties: ['openFile']})
 
-lib2sch(libContents, 'shapes')
+if (filePaths.length === 1) {
+  // Read the library that we want to convert and add it to the reader
+  const libContents = fs.readFileSync(filePaths[0], 'utf8')
+
+  lib2sch(libContents, 'shapes')
+}

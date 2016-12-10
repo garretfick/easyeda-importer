@@ -16,7 +16,8 @@ module.exports = {
     // which essentially leave them unchanged.
     (() => {
       const IGNORES = [
-        'fs'
+        'fs',
+        'electron'
       ]
       return (context, request, callback) => {
         if (IGNORES.indexOf(request) >= 0) {

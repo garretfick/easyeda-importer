@@ -56,11 +56,11 @@ describe('Integration library to schematic', () => {
       component.annotation.gge3.string.should.equal('U1')
     })
 
-    it('libraryToSchematic() creates CIRCLE library', () => {
+    it('libraryToSchematic() creates SHAPES library', () => {
       const libContents = fs.readFileSync('test/kicad/shapes/shapes.lib', 'utf8')
 
       let schematic = null
-      lib2sch(libContents, 'OPAMP', { instFilter: ({compName}) => compName === 'CIRCLE' }, (action, converted) => {
+      lib2sch(libContents, 'OPAMP', { instFilter: ({libraryName, componentName}) => componentName === 'CIRCLE' }, (action, converted) => {
         schematic = converted.source
       })
 
