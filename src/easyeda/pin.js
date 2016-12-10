@@ -251,6 +251,16 @@ class Pin extends DrawingObject
   get electricalType () {
     return this.data.configure.electric
   }
+
+  get bounds () {
+    // TODO this is definitely wrong, not including the length here
+    return {
+      x: this.anchor.x,
+      y: this.anchor.y,
+      width: 0,
+      height: 0
+    }
+  }
 }
 
 Pin.xyProps = ['configure', 'dot', 'name', 'num', 'pinDot']

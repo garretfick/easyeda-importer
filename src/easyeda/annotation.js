@@ -49,6 +49,16 @@ class Annotation extends DrawingObject
     this.y += dy
   }
 
+  get bounds () {
+    // TODO this is definitely wrong, but ok for now
+    return {
+      x: this.x,
+      y: this.y,
+      width: 0,
+      height: 0
+    }
+  }
+
   /**
    * @see SimpleShape._getStringProps()
    */

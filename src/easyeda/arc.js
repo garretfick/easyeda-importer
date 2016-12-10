@@ -15,6 +15,19 @@ class Arc extends SimpleShape
     this.pathString = ''
   }
 
+  translate (dx, dy) {
+    // TODO
+  }
+
+  get bounds () {
+    return {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0
+    }
+  }
+
 // M startX, startY A rx, ry x-axis-rotation large-arc-flag sweep-flag endX endY
 }
 

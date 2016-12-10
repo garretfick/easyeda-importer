@@ -56,7 +56,7 @@ describe('Integration library to schematic', () => {
       component.annotation.gge3.string.should.equal('U1')
     })
 
-    it('libraryToSchematic() creates SHAPES library', () => {
+    it('libraryToSchematic() creates SHAPES library (only CIRCLE)', () => {
       const libContents = fs.readFileSync('test/kicad/shapes/shapes.lib', 'utf8')
 
       let schematic = null
@@ -83,6 +83,20 @@ describe('Integration library to schematic', () => {
 
       // Validate there should be 4 ellipses
       component.should.have.property('ellipse').have.size(4)
+    })
+
+    it('libraryToSchematic() creates SHAPES library', () => {
+      const libContents = fs.readFileSync('test/kicad/shapes/shapes.lib', 'utf8')
+
+      let schematic = null
+      lib2sch(libContents, 'OPAMP', {}, (action, converted) => {
+        schematic = converted.source
+      })
+
+      should.exist(schematic)
+
+      schematic.should.have.property('schlib')
+      schematic.should.have.property('itemOrder').have.length(6)
     })
   })
 })

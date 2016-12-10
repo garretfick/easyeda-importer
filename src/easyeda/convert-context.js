@@ -1,6 +1,7 @@
 'use strict'
 
 const EasyEdaFactory = require('./easyeda-factory')
+const ItemGridLayout = require('./item-grid-layout')
 const RefDesGenerator = require('./refdes-generator')
 
 /**
@@ -15,6 +16,7 @@ class ConvertContext {
     this.libs = {}
     this.errors = []
     this.factory = new EasyEdaFactory()
+    this.layoutStrategy = new ItemGridLayout()
   }
 
   /**
@@ -93,6 +95,9 @@ class ConvertContext {
             // Create the instance that can exist on a schematic
             const compLibInst = compDef.toInstance(name)
 
+            // Position it according to our strategy
+            this.layoutStrategy.layout(compLibInst)
+
             const prefix = compDef.refDesPrefix
             compLibInst.refDes = refDesGenerator.nextRefDes(prefix)
 
@@ -103,7 +108,7 @@ class ConvertContext {
       })
     })
 
-    backend.endSchematicContext()
+    backend.endSchematicContext(this.layoutStrategy.bounds)
   }
 }
 

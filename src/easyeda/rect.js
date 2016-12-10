@@ -34,6 +34,15 @@ class Rect extends SimpleShape
     this.y += dy
   }
 
+  get bounds () {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.width,
+      height: this.height
+    }
+  }
+
   /**
    * @see SimpleShape._getStringProps()
    */

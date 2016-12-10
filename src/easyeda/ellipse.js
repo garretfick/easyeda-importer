@@ -38,6 +38,15 @@ class Ellipse extends SimpleShape
     this.cy += dy
   }
 
+  get bounds () {
+    return {
+      x: this.cx - this.rx,
+      y: this.cy - this.ry,
+      width: this.rx,
+      height: this.ry
+    }
+  }
+
   /**
    * @see SimpleShape._getStringProps()
    */

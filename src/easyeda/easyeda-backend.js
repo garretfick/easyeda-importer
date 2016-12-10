@@ -51,9 +51,21 @@ class EasyEdaBackend {
 
   /**
    * End the schematic context, removing it from the context stack
+   *
+   * @param {object} bounds The bounds of the created schematic (so we don't have to calculate it)
+   * from the primitives
    */
-  endSchematicContext () {
-    return this._popContext()
+  endSchematicContext (bounds) {
+    const schematic = this._popContext()
+
+    schematic.BBox = {
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.width,
+      height: bounds.height
+    }
+
+    return schematic
   }
 
   /**

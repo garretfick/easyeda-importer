@@ -82,6 +82,43 @@ class SchLib extends DrawingObject
 
     return { primitives: data, id: data.head.gId }
   }
+
+  /**
+   * Offset this instance by the specified x and y distance
+   */
+  translate (dx, dy) {
+    // Offset our children and then move ourselves
+    this._shapes.forEach(child => child.translate(dx, dy))
+    this.point.translate(dx, dy)
+  }
+
+  /**
+   * Get the bounding box for this item
+   */
+  get bounds () {
+    // Get the bounds for all of the objects
+    const bounds = this._shapes.map(child => child.bounds)
+
+    // Then calculate the total bounds for each
+    const xMin = Math.min.apply(null, bounds.map(b => b.x))
+    const yMin = Math.min.apply(null, bounds.map(b => b.y))
+    const xMax = Math.max.apply(null, bounds.map(b => b.x + b.width))
+    const yMax = Math.max.apply(null, bounds.map(b => b.y + b.height))
+
+    return {
+      x: xMin,
+      y: yMin,
+      width: xMax - xMin,
+      height: yMax - yMin
+    }
+  }
+
+  /**
+   * Get he drawable shapes
+   */
+  get _shapes () {
+    return this.children
+  }
 }
 
 module.exports = SchLib
