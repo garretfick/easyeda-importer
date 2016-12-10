@@ -38,8 +38,6 @@ const lib2sch = (libContents, libName, options = {}, easyEdaApi = null) => {
     easyEdaApi = api
   }
 
-  console.log(schematicData)
-
   easyEdaApi('applySource', {source: schematicData, createNew: true})
 }
 

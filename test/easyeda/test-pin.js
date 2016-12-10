@@ -49,7 +49,7 @@ describe('Pin', () => {
       primitives.dot.x.should.equal('113')
       primitives.name.x.should.equal('96')
       primitives.num.x.should.equal('104')
-      primitives.pinDot.x.should.equal(110)
+      primitives.pinDot.x.should.equal(100)
     })
   })
 

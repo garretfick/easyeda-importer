@@ -8,6 +8,18 @@ const lib2sch = require('../../src/util/lib2sch')
 
 describe('Integration library to schematic', () => {
   describe('#libraryToSchematic()', () => {
+    it('libraryToSchematic() creates RECT library', () => {
+      const libContents = fs.readFileSync('test/kicad/rect/rect.lib', 'utf8')
+
+      let schematic = null
+      lib2sch(libContents, 'RECT', {}, (action, converted) => {
+        schematic = converted.source
+      })
+
+      // TODO this test is definitely incomplete
+      should.exist(schematic)
+    })
+
     it('libraryToSchematic() creates OPAMP library', () => {
       const libContents = fs.readFileSync('test/kicad/opamp/opamp.lib', 'utf8')
 

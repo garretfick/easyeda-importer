@@ -339,17 +339,21 @@ class KiCadLibReader {
         break
       case 'X':
         // X name number posx posy length orientation Snum Snom unit convert Etype [shape]
-        // TODO the shape and electrical type are not handled yet
-
+        // xpos and ypos represent the point where you connect the wire to the pin (not where it
+        // touches the body of the component)
         let pin = this.factory.createPin()
 
         rd.readFieldsInto(pin, value,
           [null, 'name', 'number', 'x', 'y',
-          'length', 'orientation', 'numberDimension', 'nameDimension',
-          '__kicad_unit', '__kicad_convert', 'electricalType', 'shape'],
+          'length', '__kicad_orientation', 'numberDimension', 'nameDimension',
+          '__kicad_unit', '__kicad_convert', 'electricalType', '__kicad_shape'],
           [null, null, null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos,
           KiCadLibReader._parseLength, KiCadLibReader._parsePinOrientation, parseInt, parseInt,
           null, null, KiCadLibReader._parseElecType, null])
+
+        // The mapping to pin shape is a little more complex, so handle that separately
+        pin.rotate(pin.__kicad_orientation)
+        KiCadLibReader._convertPinShape(pin)
 
         shape = pin
         break
@@ -448,10 +452,10 @@ class KiCadLibReader {
 
     switch (value) {
       case 'U':
-        rotation = 90
+        rotation = 270
         break
       case 'D':
-        rotation = 270
+        rotation = 90
         break
       case 'R':
         rotation = 0
@@ -479,6 +483,23 @@ class KiCadLibReader {
       default:
         // TODO give a message about unsupported type
         return Pin.ELEC_TYPE_UNDEFINED
+    }
+  }
+
+  static _convertPinShape (pin) {
+    switch (pin.__kicad_shape) {
+      case 'I':
+        pin.isInverting = true
+        break
+      case 'C':
+        pin.isClock = true
+        break
+      case 'CI':
+        pin.isInverting = true
+        pin.isClock = true
+        break
+      // There are many more, but we only handle these cases since
+      // EasyEDA doesn't display other types
     }
   }
 

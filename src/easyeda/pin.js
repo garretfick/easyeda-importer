@@ -3,6 +3,7 @@
 const deepcopy = require('deepcopy')
 const DrawingObject = require('./drawing-object')
 const Point = require('../util/point')
+const Rectangle = require('../util/rectangle')
 const SVGPathData = require('svg-pathdata')
 
 /**
@@ -19,12 +20,11 @@ class Pin extends DrawingObject
     super()
     this.__type = 'pin'
 
-    // Our current anchor position (where it connects to the body of the symbol)
-    // This is not the point where you connect a wire. Keep track of this
+    // Our current anchor position (where you connect a wire). Keep track of this
     // as we manipulte the pin so we know where we are at all times
-    this.anchor = new Point(0, 0)
+    this.connectionPoint = new Point(0, 0)
     // Our default pin length is 10 units
-    this.connectionPoint = new Point(10, 0)
+    this.bodyPoint = new Point(10, 0)
 
     this.data = {
       clock: {
@@ -65,7 +65,9 @@ class Pin extends DrawingObject
         pinColor: '#000000'
       },
       pinDot: {
-        point: new Point(10, 0)
+        // This coincides with the connection point (for the wire)
+        // Maybe it actually is the same thing
+        point: new Point(0, 0)
       }
     }
   }
@@ -96,7 +98,7 @@ class Pin extends DrawingObject
     })
 
     // Create the pathString item for the path property
-    primitives.path.pathString = ['M', this.anchor.x, this.anchor.y, this.connectionPoint.x, this.connectionPoint.y].join(' ')
+    primitives.path.pathString = ['M', this.bodyPoint.x, this.bodyPoint.y, this.connectionPoint.x, this.connectionPoint.y].join(' ')
 
     primitives.configure.gId = idGenerator.nextGid()
 
@@ -130,11 +132,12 @@ class Pin extends DrawingObject
   }
 
   /**
-   * Offset the pin to the new X position
+   * Offset the pin to the new X position. This sets the location
+   * of the connection point, where you connect a wire
    * @param {number} number The new X position
    */
   set x (number) {
-    let offsetX = number - this.anchor.x
+    let offsetX = number - this.connectionPoint.x
     this.translate(offsetX, 0)
 
     return this
@@ -144,22 +147,23 @@ class Pin extends DrawingObject
    * Get the current X postition of the pin
    */
   get x () {
-    return this.anchor.x
+    return this.connectionPoint.x
   }
 
   /**
-   * Offset the pin ot the new Y position
+   * Offset the pin ot the new Y position. This sets the location
+   * of the connection point, where you connect a wire
    * @param {number} number The new Y position
    */
   set y (number) {
-    let offsetY = number - this.anchor.y
+    let offsetY = number - this.connectionPoint.y
     this.translate(0, offsetY)
 
     return this
   }
 
   get y () {
-    return this.anchor.y
+    return this.connectionPoint.y
   }
 
   /**
@@ -175,6 +179,9 @@ class Pin extends DrawingObject
 
     // Move the nested members
     Pin.xyProps.forEach(propName => {
+      if (!this.data[propName].point) {
+        return
+      }
       this.data[propName].point.translate(dx, dy)
     })
 
@@ -183,8 +190,8 @@ class Pin extends DrawingObject
     })
 
     // Move our anchor and connection points to the new locations
-    this.anchor.translate(dx, dy)
     this.connectionPoint.translate(dx, dy)
+    this.bodyPoint.translate(dx, dy)
 
     return this
   }
@@ -195,13 +202,13 @@ class Pin extends DrawingObject
   set length (length) {
     // TODO currently, this works for KiCAD because we get the pin length before rotating
     // TODO if the order changes, then this is no valid
-    if (this.connectionPoint.y !== this.anchor.y) {
+    if (this.connectionPoint.y !== this.bodyPoint.y) {
       throw new Error('You must set the length before rotating the pin, or fix this function')
     }
 
     // Since we are not allowing you to rotate first, setting the length is the same as setting
     // the location
-    this.connectionPoint.x = this.anchor.x + length
+    this.bodyPoint.x = this.connectionPoint.x + length
   }
 
   /**
@@ -210,29 +217,38 @@ class Pin extends DrawingObject
    * @return {number} The length of the pin
    */
   get length () {
-    return this.anchor.distance(this.connectionPoint)
+    return this.connectionPoint.distance(this.bodyPoint)
   }
 
   /**
-   * Set the orientation of the point. This is an implied rotation about the current center point.
+   * Rotate the pin. This is an implied rotation about the connection point (where you connect the wire)
    */
-  set orientation (angleDegrees) {
+  rotate (angleDegrees) {
     if (angleDegrees === 0) {
       return this
     }
 
     Pin.xyProps.forEach(propName => {
-      this.data[propName].point.rotateDegrees(angleDegrees, this.anchor)
+      this.data[propName].point.rotateDegrees(angleDegrees, this.connectionPoint)
     })
 
     // TODO this is not rotating because the implementation doessn't seem to allow
     // TODO rotation about arbitrary point. We need to translate, rotate, then translate
     // TODO back.
     Pin.pathProps.forEach(propName => {
-      // this.data[propName].pathString = this.data[propName].pathString.translate(dx, dy)
+      // The current location is relative to the body point so move it from there
+      // to the connection point
+      //const {dx, dy} = this.connectionPoint.sub(this.bodyPoint)
+      //let path = this.data[propName].pathString.translate(dx, dy)
+      // Do the rotation
+      //path.rotate(angleDegrees)
+      // TODO Move it back to where it should be (this must be wrong)
+      //path.translate(-dx, -dy)
+
+      //this.data[propName].pathString = path
     })
 
-    this.connectionPoint.rotateDegrees(angleDegrees, this.anchor)
+    this.bodyPoint.rotateDegrees(angleDegrees, this.connectionPoint)
 
     return this
   }
@@ -252,14 +268,25 @@ class Pin extends DrawingObject
     return this.data.configure.electric
   }
 
+  /**
+   * Set the pin to be an inverting pin
+   */
+  set isInverting (isInverting) {
+    this.data.dot.visible = isInverting ? 1 : 0
+  }
+
+  /**
+   * Set the pin to be a clock pin
+   */
+  set isClock (isClock) {
+    this.data.clock.visible = isClock ? 1 : 0
+  }
+
+  /**
+   * Gets the bounding box of the pin. This currently doesn't include the text position
+   */
   get bounds () {
-    // TODO this is definitely wrong, not including the length here
-    return {
-      x: this.anchor.x,
-      y: this.anchor.y,
-      width: 0,
-      height: 0
-    }
+    return Rectangle.fromPoints(this.connectionPoint, this.bodyPoint)
   }
 }
 

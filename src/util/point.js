@@ -48,6 +48,12 @@ class Point {
     let dy = (this.y - other.y)
     return Math.round(Math.sqrt(dx * dx + dy * dy))
   }
+
+  sub (other) {
+    const dx = this.x - this.other.x
+    const dy = this.y - this.other.y
+    return {dx, dy}
+  }
 }
 
 module.exports = Point
