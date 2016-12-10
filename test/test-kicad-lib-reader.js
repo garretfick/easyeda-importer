@@ -121,8 +121,8 @@ describe('KiCadLibReader', () => {
     it('_readGraphic() arc 1', () => {
       const shape = reader._readGraphic('A -1 -200 49 900 -11 0 1 0 N -50 -200 0 -150')
 
-      shape.x.should.equal(-0.1)
-      shape.y.should.equal(20.0)
+      shape.cx.should.equal(-0.1)
+      shape.cy.should.equal(20.0)
       shape.radius.should.equal(4.9)
       shape.startAngle.should.equal(90)
       shape.endAngle.should.equal(-1.1)
@@ -139,8 +139,8 @@ describe('KiCadLibReader', () => {
     it('_readGraphic() arc 2', () => {
       const shape = reader._readGraphic('A 0 -199 49 0 -911 0 1 0 N 0 -150 50 -200')
 
-      shape.x.should.equal(0)
-      shape.y.should.equal(19.9)
+      shape.cx.should.equal(0)
+      shape.cy.should.equal(19.9)
       shape.radius.should.equal(4.9)
       shape.startAngle.should.equal(0)
       shape.endAngle.should.equal(-91.1)

@@ -310,14 +310,14 @@ class KiCadLibReader {
           null, null, KiCadLibReader._parseWidth, KiCadLibReader._parseFillStyle])
         break
       case 'A':
-        // A posx posy radius start end part convert thickness cc start_pointX start_pointY end_pointX end_pointY
+        // A cx cy radius angleStart angleEnd part convert thickness cc start_pointX start_pointY end_pointX end_pointY
 
         shape = this.factory.createArc()
 
         // TODO this is all wrong
 
         rd.readFieldsInto(shape, value,
-          [null, 'x', 'y', 'radius',
+          [null, 'cx', 'cy', 'radius',
           'startAngle', 'endAngle', '__kicad_unit', '__kicad_convert',
           'thickness', 'filled', 'startPointX', 'startPointY',
           'endPointX', 'endPointY'],

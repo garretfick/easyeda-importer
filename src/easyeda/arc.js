@@ -1,6 +1,7 @@
 'use strict'
 
 const SimpleShape = require('./simple-shape')
+const Point = require('../util/point')
 
 /**
  * Arc drawing object
@@ -13,16 +14,37 @@ class Arc extends SimpleShape
 
     this.helperDots = ''
     this.pathString = ''
+
+    this.center = new Point()
+    this.radius = 10
+    this.startAngle = 0
+    this.endAngle = 0
   }
 
   translate (dx, dy) {
-    // TODO
+    this.center.translate(dx, dy)
+  }
+
+  set cx (x) {
+    this.center.x = x
+  }
+
+  get cx () {
+    return this.center.x
+  }
+
+  set cy (y) {
+    this.center.y = y
+  }
+
+  get cy () {
+    return this.center.y
   }
 
   get bounds () {
     return {
-      x: 0,
-      y: 0,
+      x: this.center.x,
+      y: this.center.y,
       width: 0,
       height: 0
     }
@@ -32,3 +54,29 @@ class Arc extends SimpleShape
 }
 
 module.exports = Arc
+
+
+
+/*function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY + (radius * Math.sin(angleInRadians))
+  };
+}
+
+function describeArc(x, y, radius, startAngle, endAngle){
+
+    var start = polarToCartesian(x, y, radius, endAngle);
+    var end = polarToCartesian(x, y, radius, startAngle);
+
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+    var d = [
+        "M", start.x, start.y, 
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(" ");
+
+    return d;       
+}*/
