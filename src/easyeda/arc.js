@@ -3,6 +3,15 @@
 const SimpleShape = require('./simple-shape')
 const Point = require('../util/point')
 
+const polarToCartesian = (center, radius, angleDegrees) => {
+  var angleInRadians = (angleDegrees - 90) * Math.PI / 180.0
+
+  return new Point(
+    center.x + (radius * Math.cos(angleInRadians)),
+    center.y + (radius * Math.sin(angleInRadians))
+  )
+}
+
 /**
  * Arc drawing object
  */
@@ -12,7 +21,6 @@ class Arc extends SimpleShape
     super()
     this.__type = 'arc'
 
-    this.helperDots = ''
     this.pathString = ''
 
     this.center = new Point()
@@ -50,33 +58,44 @@ class Arc extends SimpleShape
     }
   }
 
-// M startX, startY A rx, ry x-axis-rotation large-arc-flag sweep-flag endX endY
+  _primitiveData () {
+    const fillColor = this.fillColor
+    const strokeColor = this.strokeColor
+    const strokeStyle = this.strokeStyle
+    const strokeWidth = this.strokeWidth
+    const pathString = this._toPathString()
+    return {
+      fillColor,
+      strokeColor,
+      strokeStyle,
+      strokeWidth,
+      pathString,
+      helplerDots: ''
+    }
+  }
+
+  _startPoint () {
+    return polarToCartesian(this.center, this.radius, this.startAngle)
+  }
+
+  _endPoint () {
+    return polarToCartesian(this.center, this.radius, this.endAngle)
+  }
+
+  _toPathString () {
+    const start = this._startPoint()
+    const end = this._endPoint()
+
+    const largeArcFlag = this.endAngle - this.startAngle <= 180 ? '0' : '1'
+
+    // M startX, startY A rx, ry x-axis-rotation large-arc-flag sweep-flag endX endY
+    const d = [
+      'M', start.x, start.y,
+      'A', this.radius, this.radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(' ')
+
+    return d
+  }
 }
 
 module.exports = Arc
-
-
-
-/*function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-  var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-
-  return {
-    x: centerX + (radius * Math.cos(angleInRadians)),
-    y: centerY + (radius * Math.sin(angleInRadians))
-  };
-}
-
-function describeArc(x, y, radius, startAngle, endAngle){
-
-    var start = polarToCartesian(x, y, radius, endAngle);
-    var end = polarToCartesian(x, y, radius, startAngle);
-
-    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-
-    var d = [
-        "M", start.x, start.y, 
-        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-    ].join(" ");
-
-    return d;       
-}*/
