@@ -20,8 +20,10 @@ class Point {
   }
 
   /**
-   * Rotate the point by the specified angle in degrees
+   * Rotate this point by the specified angle in degrees
    *
+   * @param {number} angleDegrees The rotation angle, in degrees
+   * @param {Point} center The point of rotation
    * @return {Point} This point, rotated
    */
   rotateDegrees (angleDegrees, center = Point(0, 0)) {

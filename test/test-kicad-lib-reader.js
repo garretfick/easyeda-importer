@@ -128,12 +128,12 @@ describe('KiCadLibReader', () => {
       shape.endAngle.should.equal(-1.1)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.thickness.should.equal(0)
+      shape.strokeWidth.should.equal(0)
       shape.filled.should.be.false
-      shape.startPointX.should.equal(-5)
-      shape.startPointY.should.equal(20)
-      shape.endPointX.should.equal(0)
-      shape.endPointY.should.equal(15)
+      shape.start.x.should.equal(-5)
+      shape.start.y.should.equal(20)
+      shape.end.x.should.equal(0)
+      shape.end.y.should.equal(15)
     })
 
     it('_readGraphic() arc 2', () => {
@@ -146,12 +146,12 @@ describe('KiCadLibReader', () => {
       shape.endAngle.should.equal(-91.1)
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
-      shape.thickness.should.equal(0)
+      shape.strokeWidth.should.equal(0)
       shape.filled.should.be.false
-      shape.startPointX.should.equal(0)
-      shape.startPointY.should.equal(15)
-      shape.endPointX.should.equal(5)
-      shape.endPointY.should.equal(20)
+      shape.start.x.should.equal(0)
+      shape.start.y.should.equal(15)
+      shape.end.x.should.equal(5)
+      shape.end.y.should.equal(20)
     })
 
     it('_readGraphic() text', () => {
