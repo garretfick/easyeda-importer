@@ -47,8 +47,8 @@ describe('Pin', () => {
 
       // Validate that the path data is correctly output
       primitives.dot.x.should.equal('113')
-      primitives.name.x.should.equal('96')
-      primitives.num.x.should.equal('104')
+      primitives.name.x.should.equal('112')
+      primitives.num.x.should.equal('105')
       primitives.pinDot.x.should.equal(100)
     })
   })
@@ -69,7 +69,7 @@ describe('Pin', () => {
       // Validate that the path data is correctly output
       primitives.dot.y.should.equal('100')
       primitives.name.y.should.equal('100')
-      primitives.num.y.should.equal('95')
+      primitives.num.y.should.equal('99')
       primitives.pinDot.y.should.equal(100)
     })
   })

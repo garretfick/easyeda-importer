@@ -12,10 +12,13 @@ const RefDesGenerator = require('./refdes-generator')
  * The KiCAD readers operates on this context to populate the information.
  */
 class ConvertContext {
-  constructor () {
+  /**
+   * @param {KiCadTheme} theme If you want to theme the result, then the theme to use
+   */
+  constructor (theme = null) {
     this.libs = {}
     this.errors = []
-    this.factory = new EasyEdaFactory()
+    this.factory = new EasyEdaFactory(theme)
     this.layoutStrategy = new ItemGridLayout()
   }
 

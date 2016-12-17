@@ -8,8 +8,8 @@ const SVGPathData = require('svg-pathdata')
 
 /**
  * Schematic pin. Our initial position of the pin is at (0, 0) pointing to the right
- * and ending at (10, 0). That is, it would be on the right side of the component, and
- * you would connect a wire at (10, 0).
+ * and ending at (10, 0). That is, it would be on the left side of the component, and
+ * you would connect a wire at (0, 0).
  *
  * Important to note that locations for the pin are absolute coordinates, they are
  * not relative to the owing symbol.
@@ -35,7 +35,7 @@ class Pin extends DrawingObject
         display: 'show',
         electric: Pin.ELEC_TYPE_UNDEFINED,
         // gId: '',
-        rotation: '0',
+        rotation: '180',
         spicePin: '1',
         point: new Point(13, 0)
       },
@@ -50,7 +50,7 @@ class Pin extends DrawingObject
         text: '',
         textAnchor: 'start',
         visible: 1,
-        point: new Point(-4, 0)
+        point: new Point(12, 0)
       },
       num: {
         fontFamily: '',
@@ -59,17 +59,22 @@ class Pin extends DrawingObject
         text: '',
         textAnchor: 'end',
         visible: 0,
-        point: new Point(4, -5)
+        point: new Point(5, -1)
       },
       path: {
         pinColor: '#000000'
       },
       pinDot: {
         // This coincides with the connection point (for the wire)
-        // Maybe it actually is the same thing
+        // Maybe it actually is the same thing.
+        // It is a small gray dot that you see drawn on the page
         point: new Point(0, 0)
       }
     }
+  }
+
+  applyTheme (theme) {
+    this.data.path.pinColor = theme.pinColor
   }
 
   /**
@@ -209,6 +214,8 @@ class Pin extends DrawingObject
     // Since we are not allowing you to rotate first, setting the length is the same as setting
     // the location
     this.bodyPoint.x = this.connectionPoint.x + length
+    this.data.name.point.x += length
+    this.data.num.point.x += length
   }
 
   /**
@@ -249,6 +256,12 @@ class Pin extends DrawingObject
     })
 
     this.bodyPoint.rotateDegrees(angleDegrees, this.connectionPoint)
+
+    // Adjust the anchor for the text based on the pin angle
+    if (angleDegrees >= 135 && angleDegrees < 215) {
+      this.data.name.textAnchor = 'end'
+      this.data.num.textAnchor = 'start'
+    }
 
     return this
   }

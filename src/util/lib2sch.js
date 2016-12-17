@@ -3,6 +3,7 @@
 const ConvertContext = require('../easyeda/convert-context')
 const EasyEdaBackend = require('../easyeda/easyeda-backend')
 const KiCadLibReader = require('../kicad/kicad-lib-reader')
+const Theme = require('../theme/theme')
 
 /**
  * Convert a library to schematic.
@@ -17,7 +18,7 @@ const KiCadLibReader = require('../kicad/kicad-lib-reader')
  */
 const lib2sch = (libContents, libName, options = {}, easyEdaApi = null) => {
   // Create the context for reading and converting
-  let context = new ConvertContext()
+  let context = new ConvertContext(new Theme(Theme.KICAD))
 
   // Read the library into the context
   KiCadLibReader.readToContext(libContents, options.libName, context)

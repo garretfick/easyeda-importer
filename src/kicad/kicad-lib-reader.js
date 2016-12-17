@@ -267,7 +267,7 @@ class KiCadLibReader {
         shape.pointArr = points
 
         // Finally, the last item is the fill
-        shape.fillColor = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
+        shape.filled = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
 
         // If we find that this is closed, then convert it to a polygon
         if (shape.isClosed()) {
@@ -287,7 +287,7 @@ class KiCadLibReader {
         rd.readFieldsInto(shape, value,
           [null, '__kicad_startx', '__kicad_starty', '__kicad_endx',
           '__kicad_endy', '__kicad_unit', '__kicad_convert', 'strokeWidth',
-          'fillColor'],
+          'filled'],
           [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseXPos,
           KiCadLibReader._parseYPos, null, null, KiCadLibReader._parseWidth,
           KiCadLibReader._parseFillStyle])
@@ -305,7 +305,7 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'cx', 'cy', 'radius',
-          '__kicad_unit', '__kicad_convert', 'strokeWidth', 'fillColor'],
+          '__kicad_unit', '__kicad_convert', 'strokeWidth', 'filled'],
           [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseLength,
           null, null, KiCadLibReader._parseWidth, KiCadLibReader._parseFillStyle])
         break
@@ -406,7 +406,7 @@ class KiCadLibReader {
    */
   static _parseFillStyle (value) {
     // This seems wrong, but as far as I can tell, lowercase f means non-filled
-    return rd.parseOptions(value, { F: '#000000', f: 'none', N: 'none' })
+    return rd.parseOptions(value, { F: true, f: false, N: false })
   }
 
   static _parseWidth (value) {

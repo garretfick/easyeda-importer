@@ -17,12 +17,18 @@ const SchLib = require('./schlib')
  */
 class EasyEdaFactory
 {
+  constructor (theme = null) {
+    this.theme = theme
+  }
+
   /**
    * Create a pin drawing object
    * @return {Pin} The created pin
    */
   createPin () {
-    return new Pin()
+    const pin = new Pin()
+    this._applyTheme(pin)
+    return pin
   }
 
   /**
@@ -30,7 +36,9 @@ class EasyEdaFactory
    * @return {Rect} The created rectangle
    */
   createRect () {
-    return new Rect()
+    const rect = new Rect()
+    this._applyTheme(rect)
+    return rect
   }
 
   /**
@@ -38,14 +46,18 @@ class EasyEdaFactory
    * @return {Polygon} The created polygon
    */
   createPolygon () {
-    return new Polygon()
+    const poly = new Polygon()
+    this._applyTheme(poly)
+    return poly
   }
 
   /**
    * Create a new polyline drawing object
    */
   createPolyline () {
-    return new Polyline()
+    const poly = new Polyline()
+    this._applyTheme(poly)
+    return poly
   }
 
   /**
@@ -53,7 +65,9 @@ class EasyEdaFactory
    * @return {Ellipse} The created ellipse
    */
   createEllipse () {
-    return new Ellipse()
+    const ellipse = new Ellipse()
+    this._applyTheme(ellipse)
+    return ellipse
   }
 
   /**
@@ -61,7 +75,9 @@ class EasyEdaFactory
    * @return {Arc} The created arc
    */
   createArc () {
-    return new Arc()
+    const arc = new Arc()
+    this._applyTheme(arc)
+    return arc
   }
 
   /**
@@ -69,7 +85,9 @@ class EasyEdaFactory
    * @return {Annotation} The created text
    */
   createAnnotation () {
-    return new Annotation()
+    const annotation = new Annotation()
+    this._applyTheme(annotation)
+    return annotation
   }
 
   /**
@@ -94,6 +112,18 @@ class EasyEdaFactory
    */
   createCompLibrary () {
     return new CompLibrary()
+  }
+
+  /**
+   * Apply a theme to the created drawing object
+   *
+   * @param {DrawingObject} shape The created drawing object to theme
+   * @private
+   */
+  _applyTheme (shape) {
+    if (this.theme) {
+      shape.applyTheme(this.theme)
+    }
   }
 }
 

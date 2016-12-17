@@ -28,6 +28,10 @@ class Annotation extends DrawingObject
     this.y = 0
   }
 
+  applyTheme (theme) {
+    this.fillColor = theme.defaultText
+  }
+
   set isRefDes (isRefDes) {
     this.__kind = isRefDes ? Annotation.KIND_REFDES : ''
   }
