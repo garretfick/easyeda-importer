@@ -6,7 +6,7 @@
   "repository": "https://github.com/garretfick/easyeda-importer.git",
   "scripts": {
     "test": "./node_modules/.bin/mocha test/**/*.js",
-    "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha  --report lcovonly -- --check-leaks",
+    "test-with-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha test/**/test-*.js --report lcovonly -- --check-leaks",
     "dist": "npm run dist-lib2sch-test && npm run dist-lib2sch && npm run dist-sch2sch",
     "dist-lib2sch-test": "./node_modules/.bin/webpack --config webpack-lib2sch-test.config.js",
     "dist-lib2sch": "./node_modules/.bin/webpack --config webpack-lib2sch.config.js",

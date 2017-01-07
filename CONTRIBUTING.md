@@ -73,11 +73,7 @@ can try to load modules that may only be available on a specific platform (such 
 
 ### `test`
 
-Contains unit test code. For some reason, coveralls seems to report a code coverage far less that the actual coverage. I
-believe the coverage is actually > 70%, but haven't investigated why there is a difference. It is of course possible that
-my estimate is wrong and that there are large amounts of code that are not actually tested.
-
-The contents of this folder match the same structure as `src`.
+Contains unit test code. The contents of this folder match the same structure as `src`.
 
 ## Development Environment Setup
 
