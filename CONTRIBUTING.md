@@ -98,7 +98,7 @@ Build output files are generated in `dist`.
 * `bundle-lib2sch-test.js` Desktop friendly schematic importer. Imports a file from disk.
 * `bundl-sch2sch.js` Web-friendly schematic importer. Incomplete at this time.
 
-## test
+## Test
 
 Run the following to execute the unit tests:
 
