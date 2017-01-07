@@ -94,9 +94,10 @@ Run the following to build the source and generate distribution files:
 
 Build output files are generated in `dist`.
 
-* `bundle-lib2sch.js` Web-friendly component library importer. Opens a prompt to input the URL of the library to importer.
+* `bundle-lib2sch.js` Web friendly component library importer. Opens a prompt to input the URL of the library to importer.
 * `bundle-lib2sch-test.js` Desktop friendly schematic importer. Imports a file from disk.
-* `bundl-sch2sch.js` Web-friendly schematic importer. Incomplete at this time.
+* `bundle-sch2sch.js` Web friendly schematic importer. Incomplete at this time.
+* `bundle-sch2sch0-test.js` Desktop friendly schematic importer. Incomplete at this time.
 
 ## Test
 
