@@ -1,5 +1,6 @@
 'use strict'
 
+const Color = require('../util/color')
 const DrawingObject = require('./drawing-object')
 
 /**
@@ -13,7 +14,7 @@ class Annotation extends DrawingObject
     this.__kind = null
 
     this.dominantBaseline = 'none'
-    this.fillColor = ''
+    this.fillColor = Color.makeBlack()
     this.fontFamily = ''
     this.fontSize = '9pt'
     this.fontStyle = ''
@@ -80,7 +81,7 @@ class Annotation extends DrawingObject
    * @see SimpleShape._getStringProps()
    */
   _getStringProps () {
-    return super._getStringProps().concat(['x', 'y'])
+    return super._getStringProps().concat(['x', 'y', 'fillColor'])
   }
 
   /**

@@ -26,7 +26,16 @@ class Color
    */
   static makeNone () {
     const color = new Color()
-    color.selected = Color.NONE
+    color.selected = Color.FOREGROUND
+    return color
+  }
+
+  /**
+   * Create an black color
+   */
+  static makeBlack () {
+    const color = new Color()
+    color.selected = Color.FOREGROUND
     return color
   }
 
