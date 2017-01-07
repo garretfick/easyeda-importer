@@ -1,7 +1,7 @@
 'use strict'
 
 const EasyEdaFactory = require('./easyeda-factory')
-const ItemGridLayout = require('./item-grid-layout')
+const ItemGridLayout = require('../util/item-grid-layout')
 const RefDesGenerator = require('./refdes-generator')
 
 /**

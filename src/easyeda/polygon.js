@@ -25,6 +25,12 @@ class Polygon extends SimpleShape
     this.__type = 'polygon'
   }
 
+  /**
+   * Offset the rectangle by the x and y distance
+   *
+   * @param {number} dx The x distance to offset
+   * @param {number} dy The y distance to offset
+   */
   translate (dx, dy) {
     this.pointArr.forEach(pt => {
       pt.x += dx
@@ -32,6 +38,9 @@ class Polygon extends SimpleShape
     })
   }
 
+  /**
+   * Get the bounds of this rectangle
+   */
   get bounds () {
     const xMin = Math.min.apply(null, this.pointArr.map(pt => pt.x))
     const yMin = Math.min.apply(null, this.pointArr.map(pt => pt.y))

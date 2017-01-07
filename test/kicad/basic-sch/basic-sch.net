@@ -1,0 +1,47 @@
+(export (version D)
+  (design
+    (source D:/Dev/easyeda-importer/test/kicad/basic-sch/basic-sch.sch)
+    (date "2017-01-07 12:40:52 PM")
+    (tool "Eeschema 4.0.4-stable")
+    (sheet (number 1) (name /) (tstamps /)
+      (title_block
+        (title)
+        (company)
+        (rev)
+        (date)
+        (source basic-sch.sch)
+        (comment (number 1) (value ""))
+        (comment (number 2) (value ""))
+        (comment (number 3) (value ""))
+        (comment (number 4) (value "")))))
+  (components
+    (comp (ref U1)
+      (value square)
+      (libsource (lib square) (part square))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 587070E5))
+    (comp (ref U2)
+      (value square)
+      (libsource (lib square) (part square))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 58707132))
+    (comp (ref U3)
+      (value square)
+      (libsource (lib square) (part square))
+      (sheetpath (names /) (tstamps /))
+      (tstamp 587071AB)))
+  (libparts
+    (libpart (lib square) (part square)
+      (fields
+        (field (name Reference) U)
+        (field (name Value) square))
+      (pins
+        (pin (num ~) (name ~) (type input)))))
+  (libraries
+    (library (logical square)
+      (uri D:\Dev\easyeda-importer\test\kicad\basic-sch\square.lib)))
+  (nets
+    (net (code 3) (name "Net-(U1-Pad~)")
+      (node (ref U1) (pin ~))
+      (node (ref U2) (pin ~))
+      (node (ref U3) (pin ~)))))

@@ -114,7 +114,7 @@ class SchLib extends DrawingObject
   }
 
   /**
-   * Get he drawable shapes
+   * Get the drawable shapes
    */
   get _shapes () {
     return this.children

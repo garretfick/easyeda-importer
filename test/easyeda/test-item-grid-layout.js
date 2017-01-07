@@ -3,7 +3,7 @@
 'use strict'
 
 const Ellipse = require('../../src/easyeda/ellipse')
-const ItemGridLayout = require('../../src/easyeda/item-grid-layout')
+const ItemGridLayout = require('../../src/util/item-grid-layout')
 
 describe('ItemGridLayout', () => {
   describe('#layout', () => {

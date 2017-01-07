@@ -29,6 +29,10 @@ class Annotation extends DrawingObject
     this.y = 0
   }
 
+  /**
+   * Apply the color settings from the theme to this instance
+   * @param {object} theme The theme to apply to this instance
+   */
   applyTheme (theme) {
     this.fillColor = theme.defaultText
   }

@@ -73,6 +73,10 @@ class Pin extends DrawingObject
     }
   }
 
+  /**
+   * Apply the color settings from the theme to this instance.
+   * @param {object} theme The theme to apply to this instance
+   */
   applyTheme (theme) {
     this.data.path.pinColor = theme.pinColor
   }
@@ -119,6 +123,10 @@ class Pin extends DrawingObject
     return this
   }
 
+  /**
+   * Get the pin name
+   * @return {string} The pin name.
+   */
   get name () {
     return this.data.name.text
   }
@@ -132,12 +140,16 @@ class Pin extends DrawingObject
     return this
   }
 
+  /**
+   * Get the number of the pin
+   * @return {string} The pin number. Even though this is a number, it is returned as a string
+   */
   get number () {
     return this.data.num.text
   }
 
   /**
-   * Offset the pin to the new X position. This sets the location
+   * Move the pin to the new X position. This sets the location
    * of the connection point, where you connect a wire
    * @param {number} number The new X position
    */
@@ -149,14 +161,14 @@ class Pin extends DrawingObject
   }
 
   /**
-   * Get the current X postition of the pin
+   * Get the current X postition of the pin. This is where you connect a wire to the pin.
    */
   get x () {
     return this.connectionPoint.x
   }
 
   /**
-   * Offset the pin ot the new Y position. This sets the location
+   * Move the pin to the new Y position. This sets the location
    * of the connection point, where you connect a wire
    * @param {number} number The new Y position
    */
@@ -167,6 +179,9 @@ class Pin extends DrawingObject
     return this
   }
 
+  /**
+   * Get the current Y postition of the pin. This is where you connect a wire to the pin.
+   */
   get y () {
     return this.connectionPoint.y
   }
@@ -268,14 +283,15 @@ class Pin extends DrawingObject
 
   /**
    * Set the electical type of the pin
+   * @param {string} type The electrial type - one of the Pin.ELEC_TYPE_* constants.
    */
   set electricalType (type) {
     this.data.configure.electric = type
   }
 
   /**
-   * Get the electrical type of the pin
-   * @return {string} The electrical type
+   * Get the electrical type of the pin.
+   * @return {string} The electrical type - one of the Pin.ELEC_TYPE_* constants.
    */
   get electricalType () {
     return this.data.configure.electric
@@ -283,6 +299,7 @@ class Pin extends DrawingObject
 
   /**
    * Set the pin to be an inverting pin
+   * @param {boolean} isInverting True if the pin is an inverting pin, otherwise false
    */
   set isInverting (isInverting) {
     this.data.dot.visible = isInverting ? 1 : 0
@@ -290,6 +307,7 @@ class Pin extends DrawingObject
 
   /**
    * Set the pin to be a clock pin
+   * @param {boolean} isClock True if the pin is a clock pin, otherwise false
    */
   set isClock (isClock) {
     this.data.clock.visible = isClock ? 1 : 0

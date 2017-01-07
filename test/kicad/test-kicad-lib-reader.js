@@ -4,8 +4,8 @@
 
 const fs = require('fs')
 const should = require('should')
-const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
-const EasyEdaFactory = require('../src/easyeda/easyeda-factory')
+const KiCadLibReader = require('../../src/kicad/kicad-lib-reader')
+const EasyEdaFactory = require('../../src/easyeda/easyeda-factory')
 
 describe('KiCadLibReader', () => {
   describe('#_readLibrary()', () => {

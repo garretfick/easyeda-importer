@@ -21,19 +21,36 @@ class Rect extends SimpleShape
     this.y = 0
   }
 
+  /**
+   * Set the left position of this rectangle
+   * @param {number} value The left position
+   */
   set left (value) {
     this.x = value
   }
 
+  /**
+   * Set the bottom position of this rectangle
+   * @param {number} value The bottom position
+   */
   set bottom (value) {
     this.y = value
   }
 
+  /**
+   * Offset the rectangle by the x and y distance
+   *
+   * @param {number} dx The x distance to offset
+   * @param {number} dy The y distance to offset
+   */
   translate (dx, dy) {
     this.x += dx
     this.y += dy
   }
 
+  /**
+   * Get the bounds of this rectangle
+   */
   get bounds () {
     return {
       x: this.x,

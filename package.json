@@ -11,7 +11,8 @@
     "dist-lib2sch-test": "./node_modules/.bin/webpack --config webpack-lib2sch-test.config.js",
     "dist-lib2sch": "./node_modules/.bin/webpack --config webpack-lib2sch.config.js",
     "dist-sch2sch": "./node_modules/.bin/webpack --config webpack-sch2sch.config.js",
-    "lint": "./node_modules/.bin/standard"
+    "lint": "./node_modules/.bin/standard",
+    "mdlint": "./node_modules/.bin/markdownlint README.md CONTRIBUTING.md"
   },
   "keywords": [
     "easyeda",
@@ -23,6 +24,8 @@
   "devDependencies": {
     "coveralls": "2.11.14",
     "istanbul": "0.4.5",
+    "markdownlint": "0.3.1",
+    "markdownlint-cli": "0.2.0",
     "mocha": "3.1.2",
     "should": "11.1.1",
     "standard": "8.5.0",

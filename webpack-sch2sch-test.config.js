@@ -8,7 +8,7 @@ module.exports = {
   entry: './src/entry-sch2sch',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'bundle-sch2sch.js'
+    filename: 'bundle-sch2sch-test.js'
   },
   externals: [
     // For each of the names in the IGNORES list, do not

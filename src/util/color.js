@@ -6,10 +6,10 @@
  */
 class Color
 {
-  constructor (foreground = '#000000', background = '#000000') {
+  constructor (foreground = '#000000', background = '#000000', selected = Color.FOREGROUND) {
     this.foreground = foreground
     this.background = background
-    this.selected = Color.FOREGROUND
+    this.selected = selected
   }
 
   applyTheme (color) {
@@ -37,6 +37,10 @@ class Color
     const color = new Color()
     color.selected = Color.FOREGROUND
     return color
+  }
+
+  clone () {
+    return new Color(this.foreground, this.background, this.selected)
   }
 
   toString () {

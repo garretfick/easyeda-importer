@@ -1,5 +1,5 @@
 /**
- * Configuration of Webpack
+ * Configuration of Webpack to build the application to convert a library to a schematic.
  */
 
 const path = require('path')

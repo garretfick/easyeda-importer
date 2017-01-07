@@ -2,8 +2,8 @@
 
 'use strict'
 
-const EasyEdaBackend = require('../src/easyeda/easyeda-backend')
-const KiCadReader = require('../src/kicad/kicad-reader')
+const EasyEdaBackend = require('../../src/easyeda/easyeda-backend')
+const KiCadReader = require('../../src/kicad/kicad-reader')
 
 describe('KiCadReader', () => {
   let backend = null

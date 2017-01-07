@@ -12,11 +12,15 @@ class SimpleShape extends DrawingObject
     super()
 
     this.fillColor = Color.makeNone()
-    this.strokeColor = new Color('#000000')
+    this.strokeColor = Color.makeBlack()
     this.strokeStyle = 0
     this.strokeWidth = 0
   }
 
+  /**
+   * Apply the color settings from the theme to this instance.
+   * @param {object} theme The theme to apply to this instance
+   */
   applyTheme (theme) {
     this.fillColor.applyTheme(theme.defaultFill)
     this.strokeColor.applyTheme(theme.defaultStroke)

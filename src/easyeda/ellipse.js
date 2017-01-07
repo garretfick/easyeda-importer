@@ -29,11 +29,20 @@ class Ellipse extends SimpleShape
     this.ry = value
   }
 
+  /**
+   * Offset the ellipse by the x and y distance
+   *
+   * @param {number} dx The x distance to offset
+   * @param {number} dy The y distance to offset
+   */
   translate (dx, dy) {
     this.cx += dx
     this.cy += dy
   }
 
+  /**
+   * Get the bounds of this rectangle
+   */
   get bounds () {
     return {
       x: this.cx - this.rx,

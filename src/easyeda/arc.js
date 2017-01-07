@@ -96,6 +96,7 @@ class Arc extends SimpleShape
   }
 
   get bounds () {
+    // TODO this is definiteluy wrong
     return {
       x: this.center.x,
       y: this.center.y,

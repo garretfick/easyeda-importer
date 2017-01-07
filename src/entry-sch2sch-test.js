@@ -14,6 +14,7 @@ const filePaths = dialog.showOpenDialog({properties: ['openDirectory']})
 
 // Find a single sch file in the directory that we want to import
 
+
 if (filePaths.length === 1) {
   // Read the library that we want to convert and add it to the reader
   const libContents = fs.readFileSync(filePaths[0], 'utf8')

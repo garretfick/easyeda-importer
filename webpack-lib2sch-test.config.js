@@ -1,5 +1,6 @@
 /**
- * Configuration of Webpack
+ * Configuration of Webpack to build the application to convert a library to a schematic. This
+ * application only works if you have a development copy of EasyEDA that works on your desktop.
  */
 
 const path = require('path')

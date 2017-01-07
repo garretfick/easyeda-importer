@@ -2,7 +2,19 @@
 
 const Color = require('../util/color')
 
+/**
+ * A theme provides default colors and a way to apply those defaults to an object
+ */
 class Theme {
+  /**
+   * Create a new instance of the theme.
+   *
+   * @param {object} overrides Named overrides for the colors. For example to set the pin color to yellow
+   * provide an oject with the shape
+   * {
+   *   pinColor: new Color('yellow')
+   * }
+   */
   constructor (overrides = null) {
     this.overrides = overrides
   }
@@ -44,7 +56,7 @@ class Theme {
    */
   getValue (name, defaultVal) {
     if (this.overrides && this.overrides.defaults.hasOwnProperty(name)) {
-      return this.overrides.defaults[name]
+      return  this.overrides.defaults[name].clone()
     }
     return new Color(defaultVal)
   }
