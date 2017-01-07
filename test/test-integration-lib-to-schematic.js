@@ -3,6 +3,7 @@
 'use strict'
 
 const fs = require('fs')
+const should = require('should') // eslint-disable-line no-unused-vars
 const ConvertContext = require('../src/easyeda/convert-context')
 const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
 

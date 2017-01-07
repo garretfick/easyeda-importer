@@ -12,8 +12,7 @@ const lib2sch = require('./util/lib2sch')
 const {dialog} = require('electron').remote
 const filePaths = dialog.showOpenDialog({properties: ['openDirectory']})
 
-// Find a single sch file in the directory that we want to import
-
+// TODO Find a single sch file in the directory that we want to import
 
 if (filePaths.length === 1) {
   // Read the library that we want to convert and add it to the reader

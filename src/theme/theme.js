@@ -56,7 +56,7 @@ class Theme {
    */
   getValue (name, defaultVal) {
     if (this.overrides && this.overrides.defaults.hasOwnProperty(name)) {
-      return  this.overrides.defaults[name].clone()
+      return this.overrides.defaults[name].clone()
     }
     return new Color(defaultVal)
   }
