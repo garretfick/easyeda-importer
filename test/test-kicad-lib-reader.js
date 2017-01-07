@@ -83,7 +83,8 @@ describe('KiCadLibReader', () => {
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.strokeWidth.should.equal(0)
-      shape.fillColor.should.equal('#000000')
+      shape.fillColor.selected.should.equal('fg')
+      shape.fillColor.toString().should.equal('#000000')
 
       shape.pointArr.should.eql([
         {x: -5, y: -5},
@@ -102,7 +103,8 @@ describe('KiCadLibReader', () => {
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.strokeWidth.should.equal(0)
-      shape.fillColor.should.equal('none')
+      shape.fillColor.selected.should.equal('bg')
+      shape.fillColor.toString().should.equal('#000000')
     })
 
     it('_readGraphic() circle', () => {
@@ -115,7 +117,7 @@ describe('KiCadLibReader', () => {
       shape.__kicad_unit.should.equal('0')
       shape.__kicad_convert.should.equal('1')
       shape.strokeWidth.should.equal(0)
-      shape.fillColor.should.equal('#000000')
+      shape.fillColor.toString().should.equal('#000000')
     })
 
     it('_readGraphic() arc 1', () => {

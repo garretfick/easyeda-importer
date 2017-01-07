@@ -245,14 +245,14 @@ class Pin extends DrawingObject
     Pin.pathProps.forEach(propName => {
       // The current location is relative to the body point so move it from there
       // to the connection point
-      //const {dx, dy} = this.connectionPoint.sub(this.bodyPoint)
-      //let path = this.data[propName].pathString.translate(dx, dy)
+      // const {dx, dy} = this.connectionPoint.sub(this.bodyPoint)
+      // let path = this.data[propName].pathString.translate(dx, dy)
       // Do the rotation
-      //path.rotate(angleDegrees)
+      // path.rotate(angleDegrees)
       // TODO Move it back to where it should be (this must be wrong)
-      //path.translate(-dx, -dy)
+      // path.translate(-dx, -dy)
 
-      //this.data[propName].pathString = path
+      // this.data[propName].pathString = path
     })
 
     this.bodyPoint.rotateDegrees(angleDegrees, this.connectionPoint)

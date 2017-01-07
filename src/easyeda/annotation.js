@@ -36,6 +36,10 @@ class Annotation extends DrawingObject
     this.__kind = isRefDes ? Annotation.KIND_REFDES : ''
   }
 
+  /**
+   * Is this annotation the reference designator of a component? For example, R1
+   * @return {boolean} True if it is the reference designator, otherwise false
+   */
   get isRefDes () {
     return this.__kind === Annotation.KIND_REFDES
   }
@@ -44,10 +48,19 @@ class Annotation extends DrawingObject
     this.__kind = isName ? Annotation.KIND_NAME : ''
   }
 
+  /**
+   * Is this annotation the name of a component? For example, UA741
+   * @return {boolean} True if it is the name, otherwise false
+   */
   get isName () {
     return this.__kind === Annotation.KIND_NAME
   }
 
+  /**
+   * Move this annotation by the specified distance in the x and y directions
+   * @param {number} dx The x distance to Move
+   * @param {number} dy The y distance to move
+   */
   translate (dx, dy) {
     this.x += dx
     this.y += dy
@@ -70,11 +83,13 @@ class Annotation extends DrawingObject
     return super._getStringProps().concat(['x', 'y'])
   }
 
+  /**
+   * @see SimpleShape._getIntBoolProps()
+   */
   _getIntBoolProps () {
     return super._getIntBoolProps().concat(['visible'])
   }
 }
-
 
 Annotation.KIND_REFDES = 'refdes'
 Annotation.KIND_NAME = 'name'

@@ -1,14 +1,12 @@
 'use strict'
 
-const Point = require('../util/point')
-
 /**
  * Strategy to automatically generate positions for items.
  * We use this to automatically position components when
  * importing from a library
  */
 class ItemGridLayout {
-  constructor () { 
+  constructor () {
     // These are the next positions
     this.yPos = 0
     this.margin = 50
@@ -65,6 +63,10 @@ class ItemGridLayout {
     return { x: left, y: bottom, width: right - left, height: top - bottom }
   }
 
+  /**
+   * Get the bounds that we have assigned by this grid layout
+   * @return {object} Bounds shape {x, y, width, height}
+   */
   get bounds () {
     return {
       x: 0,

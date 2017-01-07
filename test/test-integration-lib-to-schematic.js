@@ -3,7 +3,6 @@
 'use strict'
 
 const fs = require('fs')
-const should = require('should')
 const ConvertContext = require('../src/easyeda/convert-context')
 const KiCadLibReader = require('../src/kicad/kicad-lib-reader')
 

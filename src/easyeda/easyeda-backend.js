@@ -44,7 +44,7 @@ class EasyEdaBackend {
 
     // We want this as a writable schematic, so immediately convert
     // this to the primitive representation
-    const { primitives, id } = schematic.toPrimitives(this.idGenerator)
+    const { primitives } = schematic.toPrimitives(this.idGenerator)
 
     this._pushContext(primitives)
   }

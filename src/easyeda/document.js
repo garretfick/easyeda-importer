@@ -1,8 +1,6 @@
 'use strict'
 
 const DrawingObject = require('./drawing-object')
-const EasyEdaFactory = require('./easyeda-factory')
-const GidGenerator = require('./gid-generator')
 
 /**
  * Represents the EasyEDA schematic document - basically a schematic

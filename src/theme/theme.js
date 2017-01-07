@@ -1,5 +1,7 @@
 'use strict'
 
+const Color = require('../util/color')
+
 class Theme {
   constructor (overrides = null) {
     this.overrides = overrides
@@ -32,9 +34,9 @@ class Theme {
 Theme.KICAD = {
   name: 'kicad',
   defaults: {
-    pinColor: '#840000',
-    defaultStroke: '#840000',
-    defaultFill: '#FFFFC2',
+    pinColor: new Color('#840000'),
+    defaultStroke: new Color('#840000'),
+    defaultFill: new Color('#FFFFC2'),
     defaultText: '#0000C2'
   }
 }

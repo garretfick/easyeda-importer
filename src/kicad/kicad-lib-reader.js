@@ -1,6 +1,7 @@
 'use strict'
 
 const rd = require('./kicad-base-reader')
+const Color = require('../util/color')
 const Pin = require('../easyeda/pin')
 
 /**
@@ -267,7 +268,7 @@ class KiCadLibReader {
         shape.pointArr = points
 
         // Finally, the last item is the fill
-        shape.filled = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
+        shape.fillType = KiCadLibReader._parseFillStyle(fields[fields.length - 1])
 
         // If we find that this is closed, then convert it to a polygon
         if (shape.isClosed()) {
@@ -287,7 +288,7 @@ class KiCadLibReader {
         rd.readFieldsInto(shape, value,
           [null, '__kicad_startx', '__kicad_starty', '__kicad_endx',
           '__kicad_endy', '__kicad_unit', '__kicad_convert', 'strokeWidth',
-          'filled'],
+          'fillType'],
           [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseXPos,
           KiCadLibReader._parseYPos, null, null, KiCadLibReader._parseWidth,
           KiCadLibReader._parseFillStyle])
@@ -305,7 +306,7 @@ class KiCadLibReader {
 
         rd.readFieldsInto(shape, value,
           [null, 'cx', 'cy', 'radius',
-          '__kicad_unit', '__kicad_convert', 'strokeWidth', 'filled'],
+          '__kicad_unit', '__kicad_convert', 'strokeWidth', 'fillType'],
           [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseLength,
           null, null, KiCadLibReader._parseWidth, KiCadLibReader._parseFillStyle])
         break
@@ -319,7 +320,7 @@ class KiCadLibReader {
         rd.readFieldsInto(shape, value,
           [null, 'cx', 'cy', 'radius',
           'startAngle', 'endAngle', '__kicad_unit', '__kicad_convert',
-          'strokeWidth', 'filled', 'startx', 'starty',
+          'strokeWidth', 'fillType', 'startx', 'starty',
           'endx', 'endy'],
           [null, KiCadLibReader._parseXPos, KiCadLibReader._parseYPos, KiCadLibReader._parseLength,
           rd.parseTenthDegreesToDegrees, rd.parseTenthDegreesToDegrees, null, null,
@@ -400,13 +401,13 @@ class KiCadLibReader {
    *
    * @param {string} The value to parse (single character)
    *
-   * @return {boolean} True if all graphic is filled, false if the graphic background is transparent
+   * @return {string} The color selection (none, foreground or background)
    *
    * @private
    */
   static _parseFillStyle (value) {
     // This seems wrong, but as far as I can tell, lowercase f means non-filled
-    return rd.parseOptions(value, { F: true, f: false, N: false })
+    return rd.parseOptions(value, { F: Color.FOREGROUND, f: Color.BACKGROUND, N: Color.NONE })
   }
 
   static _parseWidth (value) {

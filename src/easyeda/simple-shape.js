@@ -1,5 +1,6 @@
 'use strict'
 
+const Color = require('../util/color')
 const DrawingObject = require('./drawing-object')
 
 /**
@@ -10,43 +11,49 @@ class SimpleShape extends DrawingObject
   constructor () {
     super()
 
-    this.fillColor = 'none'
-    this.strokeColor = '#000000'
+    this.fillColor = Color.makeNone()
+    this.strokeColor = new Color('#000000')
     this.strokeStyle = 0
     this.strokeWidth = 0
-
-    // If we enable fill, then this is the value we set
-    this.__visibleFillColor = '#000000'
-    this.__visibleStrokeColor = '#000000'
   }
 
   applyTheme (theme) {
-    this.__visibleFillColor = theme.defaultFill
-    this.__visibleStrokeColor = theme.defaultStroke
-
-    if (this.filled) {
-      this.fillColor = this.__visibleFillColor
-    }
-
-    if (this.stroked) {
-      this.strokeColor = this.__visibleStrokeColor
-    }
+    this.fillColor.applyTheme(theme.defaultFill)
+    this.strokeColor.applyTheme(theme.defaultStroke)
   }
 
+  /**
+   * Is this shape filled?
+   * @return {boolean} True if the fill color is not none, otherwise false.
+   */
   get filled () {
-    return this.fillColor !== 'none'
+    return !this.fillColor.isNone
   }
 
-  set filled (filled) {
-    this.fillColor = filled ? this.__visibleFillColor : 'none'
+  /**
+   * Set which type of fill color we are using for the shape. Can be none, foreground or background.
+   *
+   * @oaram {string} fillType The fill type identifier, one of Color.NONE, Color.FOREGROUND, Color.BACKGROUND
+   */
+  set fillType (fillType) {
+    this.fillColor.selected = fillType
   }
 
+  /**
+   * Is this shape stroked (have non-none stroke)?
+   * @return {boolean} True if the fill color is not none, otherwise false.
+   */
   get stroked () {
-    return this.strokeColor !== 'none'
+    return !this.strokeColor.isNone
   }
 
-  set stroked (stroked) {
-    this.fillColor = stroked ? this.__visibleStrokeColor : 'none'
+  /**
+   * Set which type of stroke color we are using for the shape. Can be none, foreground or background.
+   *
+   * @oaram {string} strokeType The stroke type identifier, one of Color.NONE, Color.FOREGROUND, Color.BACKGROUND
+   */
+  set strokeType (strokeType) {
+    this.stroke.SELECTED = strokeType
   }
 
   /**
@@ -57,7 +64,7 @@ class SimpleShape extends DrawingObject
    * to a string.
    */
   _getStringProps () {
-    return ['strokeWidth']
+    return ['strokeWidth', 'fillColor', 'strokeColor']
   }
 }
 

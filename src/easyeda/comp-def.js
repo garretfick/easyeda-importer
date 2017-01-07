@@ -1,7 +1,6 @@
 'use strict'
 
 const deepcopy = require('deepcopy')
-const Annotation = require('./annotation')
 const SchLib = require('./schlib')
 
 /**

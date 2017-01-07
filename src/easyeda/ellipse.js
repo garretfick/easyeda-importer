@@ -15,12 +15,8 @@ class Ellipse extends SimpleShape
 
     this.cx = 0
     this.cy = 0
-    this.fillColor = 'none'
     this.rx = 0
     this.ry = 0
-    this.strokeColor = '#000000'
-    this.strokeStyle = 0
-    this.strokeWidth = 0
   }
 
   /**

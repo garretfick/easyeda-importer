@@ -1,7 +1,6 @@
 'use strict'
 
 const rd = require('./kicad-base-reader')
-const KiCadLibReader = require('./kicad-lib-reader')
 const EasyEdaFactory = require('../easyeda/easyeda-factory')
 
 /**

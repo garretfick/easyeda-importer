@@ -2,18 +2,11 @@
 
 'use strict'
 
-const GidGenerator = require('../../src/easyeda/gid-generator')
 const Arc = require('../../src/easyeda/arc')
 const Point = require('../../src/util/point')
 
 describe('Arc', () => {
   describe('#toPrimitives', () => {
-    let idGen = null
-
-    beforeEach(() => {
-      idGen = new GidGenerator()
-    })
-
     it('toPrimitives() converts to EasyEDA arc 1', () => {
       // A 350 -50 112 1534 266 0 1 0 F 250 0 450 0
       let arc = new Arc()
