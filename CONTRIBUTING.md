@@ -1,5 +1,10 @@
 # Contributing
 
+* [Design Guide](#design-guide)
+* [Development Environment Setup](#development-environment-setup)
+* [Build](#build)
+* [Automated Test](#automated-test)
+
 ## Design Guide
 
 This document gives a brief overview of the overal design of the KiCAD to EasyEDA converter. This should help you
@@ -66,7 +71,7 @@ There are two versions of the entry points - one for web use and one for desktop
 testing on desktop version faster that the web version, but they are equivalent. These files are also the only places that
 can try to load modules that may only be available on a specific platform (such as `fs`).
 
-## `test`
+### `test`
 
 Contains unit test code. For some reason, coveralls seems to report a code coverage far less that the actual coverage. I
 believe the coverage is actually > 70%, but haven't investigated why there is a difference. It is of course possible that
@@ -74,7 +79,7 @@ my estimate is wrong and that there are large amounts of code that are not actua
 
 The contents of this folder match the same structure as `src`.
 
-## Setup Environment
+## Development Environment Setup
 
 Follow the steps below to setup a local development environment.
 
@@ -99,7 +104,7 @@ Build output files are generated in `dist`.
 * `bundle-sch2sch.js` Web friendly schematic importer. Incomplete at this time.
 * `bundle-sch2sch0-test.js` Desktop friendly schematic importer. Incomplete at this time.
 
-## Test
+## Automated Test
 
 Run the following to execute the unit tests:
 

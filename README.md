@@ -9,7 +9,7 @@ or use a release (in the future) before you can use directly in EasyEDA.
 
 ## Build
 
-See CONTRIBUTING.md
+See [CONTRIBUTING.md](./blob/master/CONTRIBUTING.md)
 
 ## Compatibility Differences
 
